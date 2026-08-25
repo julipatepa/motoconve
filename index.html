@@ -497,43 +497,28 @@
     </div>
 
     <script>
-      // Autenticación admin ligera
-      const adminCreds = { user: 'admin', pass: 'admin123' };
+      // Firebase config (desde consola)
+      const firebaseConfig = {
+        apiKey: "AIzaSyDOhcHcwceyTfn4Yaz1I5XoT-LyMV4_WzY",
+        authDomain: "motoconve.firebaseapp.com",
+        projectId: "motoconve",
+        storageBucket: "motoconve.firebasestorage.app",
+        messagingSenderId: "53900104453",
+        appId: "1:53900104453:web:c76349416535c123e65d6c"
+      };
+
       const authBtn = document.getElementById('authBtn');
       const addMotoBtn = document.getElementById('addMotoBtn');
       const loginModal = document.getElementById('loginModal');
       const loginForm = document.getElementById('loginForm');
-      function isLoggedIn() { return sessionStorage.getItem('isAdmin') === 'true'; }
-      function showAdminUI() { document.getElementById('admin').classList.remove('hidden'); authBtn.textContent = 'Cerrar sesión'; addMotoBtn.style.display = 'inline-flex'; sessionStorage.setItem('isAdmin','true'); }
-      function hideAdminUI() { document.getElementById('admin').classList.add('hidden'); authBtn.textContent = 'Iniciar sesión'; addMotoBtn.style.display = 'none'; sessionStorage.removeItem('isAdmin'); }
-      authBtn?.addEventListener('click', () => { if (isLoggedIn()) { hideAdminUI(); } else { loginModal.classList.remove('hidden'); } });
-      loginForm?.addEventListener('submit', (e) => { e.preventDefault(); const u = loginForm.username.value; const p = loginForm.password.value; if (u === adminCreds.user && p === adminCreds.pass) { loginModal.classList.add('hidden'); showAdminUI(); loginForm.reset(); } else { alert('Usuario o contraseña incorrectos'); } });
-      document.getElementById('loginClose')?.addEventListener('click', () => { loginModal.classList.add('hidden'); });
-      addMotoBtn?.addEventListener('click', () => { document.getElementById('admin').classList.remove('hidden'); document.getElementById('marca')?.focus(); window.location.hash = '#admin'; });
-      // mantener sesión si ya estaba logueado
-      if (isLoggedIn()) { showAdminUI(); }
 
-      // Cargar desde localStorage si existe, si no usar datos por defecto
+      // Fallback local data in case Firebase no está disponible
       const defaultMotos = [
         { marca: 'Yamaha', modelo: 'R7', tipo: 'Deportiva', precio: '$18.900 USD', descripcion: 'Moto deportiva con diseño agresivo, excelente aceleración y una postura ideal para ciudad y carretera.', video: 'https://cdn.coverr.co/videos/coverr-motorcycle-riding-1561112998335/1080p.mp4', specs: ['710cc', '6 velocidades', 'ABS', '2026'], estado: 'Alta', motor: 'Alta' },
-        { marca: 'Honda', modelo: 'CB500X', tipo: 'Trail', precio: '$15.300 USD', descripcion: 'Versátil para recorridos largos, cómoda para el día a día y muy confiable en todo tipo de caminos.', video: 'https://cdn.coverr.co/videos/coverr-motorcycle-on-the-road-1561051853492/1080p.mp4', specs: ['471cc', 'Doble propósito', 'Suspensión alta', '2025'], estado: 'Alta', motor: 'Baja' },
-        { marca: 'Kawasaki', modelo: 'Ninja ZX-6R', tipo: 'Deportiva', precio: '$21.500 USD', descripcion: 'Potencia premium, electrónica avanzada y un estilo que destaca en cada salida de alto rendimiento.', video: 'https://cdn.coverr.co/videos/coverr-rider-on-a-motorcycle-1563067313349/1080p.mp4', specs: ['636cc', 'Ride modes', 'Quick shifter', '2026'], estado: 'Alta', motor: 'Alta' },
-        { marca: 'BMW', modelo: 'G310 GS', tipo: 'Trail', precio: '$12.700 USD', descripcion: 'Perfecta para explorar caminos con una mezcla de estilo, simplicidad y excelente manejo urbano.', video: 'https://cdn.coverr.co/videos/coverr-black-bike-on-the-road-1561110591785/1080p.mp4', specs: ['313cc', 'Off-road', 'Ligera', '2025'], estado: 'Baja', motor: 'Baja' },
-        { marca: 'Ducati', modelo: 'Panigale V2', tipo: 'Deportiva', precio: '$25.800 USD', descripcion: 'Superdeportiva con gran chasis y sonido característico.', video: 'https://cdn.coverr.co/videos/coverr-motorbike-day-traffic-1561051849212/1080p.mp4', specs: ['955cc', '2 cilindros', 'Electrónica', '2026'], estado: 'Alta', motor: 'Alta' },
-        { marca: 'Suzuki', modelo: 'V-Strom 650', tipo: 'Trail', precio: '$11.400 USD', descripcion: 'Aventurera ligera, preparada para viajes largos y confort.', video: '', specs: ['645cc', 'Versátil', 'Buen consumo', '2024'], estado: 'Alta', motor: 'Baja' },
-        { marca: 'Triumph', modelo: 'Street Triple', tipo: 'Calle', precio: '$13.900 USD', descripcion: 'Naked deportiva con gran equilibrio entre potencia y manejo.', video: '', specs: ['765cc', 'Agilidad', 'Electrónica', '2025'], estado: 'Alta', motor: 'Alta' },
-        { marca: 'Aprilia', modelo: 'RS 660', tipo: 'Deportiva', precio: '$14.700 USD', descripcion: 'Deportiva media cilindrada con buen rendimiento en carretera.', video: '', specs: ['660cc', '2 cilindros', 'Ligera', '2026'], estado: 'Baja', motor: 'Alta' }
+        { marca: 'Honda', modelo: 'CB500X', tipo: 'Trail', precio: '$15.300 USD', descripcion: 'Versátil para recorridos largos, cómoda para el día a día y muy confiable en todo tipo de caminos.', video: 'https://cdn.coverr.co/videos/coverr-motorcycle-on-the-road-1561051853492/1080p.mp4', specs: ['471cc', 'Doble propósito', 'Suspensión alta', '2025'], estado: 'Alta', motor: 'Baja' }
       ];
 
-      const storageKey = 'motoData';
       let motoData = [];
-      try {
-        const saved = localStorage.getItem(storageKey);
-        motoData = saved ? JSON.parse(saved) : defaultMotos.slice();
-      } catch (e) {
-        motoData = defaultMotos.slice();
-      }
-
       const grid = document.getElementById('motoGrid');
 
       function renderMotoCards(items) {
@@ -568,74 +553,114 @@
         `).join('');
       }
 
-      function saveMotos() {
-        try { localStorage.setItem(storageKey, JSON.stringify(motoData)); } catch (e) { console.warn('No se pudo guardar en localStorage'); }
-      }
-
-      // Form handling
+      // Form handling (will write to Firestore when available)
       const motoForm = document.getElementById('motoForm');
       const resetBtn = document.getElementById('resetForm');
 
-      motoForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const form = e.target;
-        const formData = new FormData(form);
-        const newMoto = {
-          marca: formData.get('marca') || 'Marca',
-          modelo: formData.get('modelo') || 'Modelo',
-          tipo: formData.get('tipo') || 'Otra',
-          precio: formData.get('precio') || '$0',
-          descripcion: formData.get('descripcion') || '',
-          video: formData.get('video') || '',
-          specs: (formData.get('specs') || '').split(',').map(s => s.trim()).filter(Boolean),
-          estado: formData.get('estado') || 'Alta',
-          motor: formData.get('motor') || 'Alta'
-        };
-        motoData.unshift(newMoto);
-        saveMotos();
-        renderMotoCards(motoData);
-        form.reset();
-      });
+      function attachFormHandler(saveFn) {
+        motoForm.addEventListener('submit', (e) => {
+          e.preventDefault();
+          const form = e.target;
+          const formData = new FormData(form);
+          const newMoto = {
+            marca: formData.get('marca') || 'Marca',
+            modelo: formData.get('modelo') || 'Modelo',
+            tipo: formData.get('tipo') || 'Otra',
+            precio: formData.get('precio') || '$0',
+            descripcion: formData.get('descripcion') || '',
+            video: formData.get('video') || '',
+            specs: (formData.get('specs') || '').split(',').map(s => s.trim()).filter(Boolean),
+            estado: formData.get('estado') || 'Alta',
+            motor: formData.get('motor') || 'Alta',
+            createdAt: new Date().toISOString()
+          };
+          saveFn(newMoto).then(() => { form.reset(); });
+        });
+      }
 
       resetBtn.addEventListener('click', () => { motoForm.reset(); });
 
-      // Render inicial
-      renderMotoCards(motoData);
+      // Initialize Firebase and wire Auth + Firestore
+      (function initFirebase() {
+        if (!firebaseConfig || !firebaseConfig.apiKey) {
+          // No config: render defaults
+          motoData = defaultMotos.slice();
+          renderMotoCards(motoData);
+          return;
+        }
 
-      const firebaseConfig = {
-        apiKey: '',
-        authDomain: '',
-        projectId: '',
-        storageBucket: '',
-        messagingSenderId: '',
-        appId: ''
-      };
-
-      const hasFirebaseConfig = Object.values(firebaseConfig).every(Boolean);
-
-      if (hasFirebaseConfig) {
-        try {
-          import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js').then(({ initializeApp }) => {
-            import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js').then(({ getFirestore, collection, getDocs }) => {
+        import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js').then(({ initializeApp }) => {
+          import('https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js').then(({ getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged }) => {
+            import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js').then(({ getFirestore, collection, addDoc, serverTimestamp, query, orderBy, onSnapshot }) => {
               const app = initializeApp(firebaseConfig);
+              const auth = getAuth(app);
               const db = getFirestore(app);
 
-              getDocs(collection(db, 'motos')).then((snapshot) => {
-                const firebaseMotos = snapshot.docs.map((doc) => ({ ...doc.data() }));
-                if (firebaseMotos.length) {
-                  motoData = firebaseMotos;
-                  saveMotos();
-                  renderMotoCards(motoData);
+              // Auth UI
+              authBtn.addEventListener('click', () => {
+                const user = auth.currentUser;
+                if (user) {
+                  signOut(auth).catch(() => {});
+                } else {
+                  loginModal.classList.remove('hidden');
                 }
-              }).catch(() => {
-                console.log('Firebase no disponible, usando datos locales.');
+              });
+
+              document.getElementById('loginClose')?.addEventListener('click', () => { loginModal.classList.add('hidden'); });
+
+              loginForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const u = loginForm.username.value;
+                const p = loginForm.password.value;
+                signInWithEmailAndPassword(auth, u, p).then(() => {
+                  loginModal.classList.add('hidden');
+                  loginForm.reset();
+                }).catch((err) => { alert('Error de autenticación: ' + (err.message || err)); });
+              });
+
+              onAuthStateChanged(auth, (user) => {
+                if (user) {
+                  // usuario logueado
+                  document.getElementById('admin').classList.remove('hidden');
+                  authBtn.textContent = 'Cerrar sesión';
+                  addMotoBtn.style.display = 'inline-flex';
+                } else {
+                  document.getElementById('admin').classList.add('hidden');
+                  authBtn.textContent = 'Iniciar sesión';
+                  addMotoBtn.style.display = 'none';
+                }
+              });
+
+              addMotoBtn?.addEventListener('click', () => { document.getElementById('admin').classList.remove('hidden'); document.getElementById('marca')?.focus(); window.location.hash = '#admin'; });
+
+              // Save function to Firestore
+              async function saveToFirestore(moto) {
+                const docRef = await addDoc(collection(db, 'motos'), { ...moto, createdAt: serverTimestamp() });
+                return docRef;
+              }
+
+              // Attach form handler to save to Firestore
+              attachFormHandler(saveToFirestore);
+
+              // Real-time listener for motos collection
+              const q = query(collection(db, 'motos'), orderBy('createdAt', 'desc'));
+              onSnapshot(q, (snapshot) => {
+                motoData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                renderMotoCards(motoData);
+              }, (err) => {
+                console.error('Error escuchando Firestore:', err);
+                // fallback: render defaults
+                motoData = defaultMotos.slice();
+                renderMotoCards(motoData);
               });
             });
           });
-        } catch (error) {
-          console.log('No se pudo conectar a Firebase, usando los datos por defecto.');
-        }
-      }
+        }).catch((err) => {
+          console.error('Error inicializando Firebase:', err);
+          motoData = defaultMotos.slice();
+          renderMotoCards(motoData);
+        });
+      })();
     </script>
   </body>
 </html>

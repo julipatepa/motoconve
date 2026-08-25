@@ -1,656 +1,2714 @@
 <!DOCTYPE html>
 <html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Motos Premium | Catálogo</title>
-    <style>
-      :root {
-        --bg: #0a0f1a;
-        --bg-2: #121b2d;
-        --panel: #17253d;
-        --panel-strong: #1d3155;
-        --text: #eaf4ff;
-        --muted: #b7c6d9;
-        --accent: #ff6b35;
-        --accent-2: #ff8f5c;
-        --line: rgba(255, 255, 255, 0.12);
-        --success: #3ad295;
-      }
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-      * { box-sizing: border-box; }
+  <title>MotoPlus | Catálogo de Motos</title>
 
-      html { scroll-behavior: smooth; }
+  <style>
+    :root {
+      --bg: #080d16;
+      --bg2: #111a2b;
+      --panel: #17253d;
+      --panel2: #1d3155;
+      --text: #eef7ff;
+      --muted: #aebed2;
+      --accent: #ff6b35;
+      --accent2: #ff9a6b;
+      --success: #3ad295;
+      --danger: #ff4d5a;
+      --line: rgba(255,255,255,.12);
+    }
 
-      body {
-        margin: 0;
-        font-family: Arial, Helvetica, sans-serif;
-        background: linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 100%);
-        color: var(--text);
-      }
+    * {
+      box-sizing: border-box;
+    }
 
-      a { color: inherit; text-decoration: none; }
+    html {
+      scroll-behavior: smooth;
+    }
 
-      .container {
-        width: min(1200px, calc(100% - 32px));
-        margin: 0 auto;
-      }
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top right, rgba(255,107,53,.12), transparent 35%),
+        linear-gradient(180deg, var(--bg), var(--bg2));
+      min-height: 100vh;
+    }
 
-      .topbar {
-        position: sticky;
-        top: 0;
-        z-index: 10;
-        backdrop-filter: blur(10px);
-        background: rgba(10, 15, 26, 0.8);
-        border-bottom: 1px solid var(--line);
-      }
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font-family: inherit;
+    }
+
+    .container {
+      width: min(1200px, calc(100% - 32px));
+      margin: auto;
+    }
+
+    /* =========================
+       BARRA SUPERIOR
+    ========================= */
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(8,13,22,.88);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .topbar-inner {
+      min-height: 74px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .brand {
+      font-size: 1.35rem;
+      font-weight: 900;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .brand span {
+      color: var(--accent);
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      color: var(--muted);
+      font-size: .95rem;
+    }
+
+    .nav a:hover {
+      color: white;
+    }
+
+    .actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* =========================
+       BOTONES
+    ========================= */
+
+    .btn {
+      border: 1px solid transparent;
+      border-radius: 999px;
+      padding: 11px 18px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      transition: .2s;
+      color: var(--text);
+      background: transparent;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .btn:disabled {
+      opacity: .55;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn.primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: white;
+    }
+
+    .btn.secondary {
+      background: rgba(255,255,255,.04);
+      border-color: var(--line);
+    }
+
+    .btn.danger {
+      color: #ff6872;
+      border-color: rgba(255,77,90,.25);
+      background: rgba(255,77,90,.05);
+    }
+
+    /* =========================
+       HERO
+    ========================= */
+
+    .hero {
+      padding: 48px 0 25px;
+    }
+
+    .hero-box {
+      display: grid;
+      grid-template-columns: 1.15fr .85fr;
+      gap: 28px;
+      align-items: center;
+      padding: 30px;
+      border-radius: 25px;
+      border: 1px solid var(--line);
+      background:
+        linear-gradient(
+          135deg,
+          rgba(255,107,53,.13),
+          rgba(29,49,85,.75)
+        );
+    }
+
+    .label {
+      display: inline-block;
+      padding: 6px 11px;
+      border-radius: 999px;
+      background: rgba(58,210,149,.13);
+      border: 1px solid rgba(58,210,149,.3);
+      color: var(--success);
+      font-size: .75rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+
+    .hero h1 {
+      margin: 15px 0;
+      font-size: clamp(2.2rem, 5vw, 4.2rem);
+      line-height: 1.02;
+    }
+
+    .hero p {
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: 1.05rem;
+      max-width: 650px;
+    }
+
+    .cta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 22px;
+    }
+
+    .hero-card {
+      overflow: hidden;
+      border-radius: 20px;
+      border: 1px solid var(--line);
+      background: rgba(0,0,0,.35);
+    }
+
+    .hero-card img {
+      display: block;
+      width: 100%;
+      height: 280px;
+      object-fit: cover;
+    }
+
+    .hero-info {
+      padding: 18px;
+    }
+
+    .price {
+      color: var(--accent2);
+      font-weight: 800;
+      font-size: 1.1rem;
+    }
+
+    /* =========================
+       SECCIONES
+    ========================= */
+
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+      margin: 30px 0 18px;
+    }
+
+    .section-head h2 {
+      margin: 0;
+      font-size: 2rem;
+    }
+
+    .filter {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+
+    .chip {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.03);
+      color: var(--muted);
+      padding: 8px 13px;
+      border-radius: 999px;
+      cursor: pointer;
+      font-size: .82rem;
+    }
+
+    .chip.active,
+    .chip:hover {
+      background: rgba(255,107,53,.14);
+      color: white;
+      border-color: rgba(255,107,53,.35);
+    }
+
+    /* =========================
+       FORMULARIO ADMIN
+    ========================= */
+
+    .hidden {
+      display: none !important;
+    }
+
+    .form-card {
+      background: rgba(10,15,26,.65);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 20px;
+      margin-bottom: 25px;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px,1fr));
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.04);
+      color: white;
+      outline: none;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: rgba(255,107,53,.7);
+    }
+
+    select option {
+      background: #17253d;
+      color: white;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 90px;
+    }
+
+    .file-wrap {
+      grid-column: 1 / -1;
+    }
+
+    .file-wrap label {
+      display: block;
+      color: var(--muted);
+      font-size: .85rem;
+      margin-bottom: 8px;
+    }
+
+    #mediaPreview {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    .preview-item {
+      width: 120px;
+      height: 90px;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      background: #000;
+    }
+
+    .preview-item img,
+    .preview-item video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .upload-status {
+      color: var(--muted);
+      font-size: .85rem;
+      margin-top: 10px;
+    }
+
+    /* =========================
+       GRID
+    ========================= */
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(290px,1fr));
+      gap: 22px;
+      padding-bottom: 60px;
+    }
+
+    .card {
+      background: rgba(23,37,61,.92);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 15px 35px rgba(0,0,0,.18);
+    }
+
+    .media-box {
+      background: #05080d;
+      overflow: hidden;
+    }
+
+    .media-list {
+      display: flex;
+      gap: 4px;
+      overflow-x: auto;
+    }
+
+    .media-list img,
+    .media-list video {
+      width: 100%;
+      min-width: 100%;
+      height: 230px;
+      object-fit: cover;
+      display: block;
+      background: #000;
+    }
+
+    .no-media {
+      height: 230px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: var(--muted);
+    }
+
+    .card-body {
+      padding: 18px;
+    }
+
+    .meta-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .meta-top h3 {
+      margin: 0;
+      font-size: 1.25rem;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      font-size: .76rem;
+    }
+
+    .badges {
+      display: flex;
+      gap: 7px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+
+    .badge {
+      padding: 5px 9px;
+      border-radius: 999px;
+      font-size: .72rem;
+      font-weight: 800;
+    }
+
+    .badge.alta {
+      color: var(--success);
+      background: rgba(58,210,149,.1);
+      border: 1px solid rgba(58,210,149,.25);
+    }
+
+    .badge.baja {
+      color: var(--accent);
+      background: rgba(255,107,53,.08);
+      border: 1px solid rgba(255,107,53,.2);
+    }
+
+    .badge.motor {
+      color: #62b4ff;
+      background: rgba(98,180,255,.08);
+      border: 1px solid rgba(98,180,255,.2);
+    }
+
+    .desc {
+      color: var(--muted);
+      line-height: 1.6;
+      font-size: .94rem;
+      min-height: 45px;
+    }
+
+    .specs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      list-style: none;
+      padding: 0;
+      margin: 14px 0;
+    }
+
+    .specs li {
+      padding: 6px 9px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.04);
+      border: 1px solid var(--line);
+      font-size: .76rem;
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .card-actions .btn {
+      flex: 1;
+      font-size: .86rem;
+    }
+
+    /* =========================
+       LOGIN
+    ========================= */
+
+    .login-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 999;
+      background: rgba(0,0,0,.75);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .login-card {
+      width: min(420px,100%);
+      background: #101a2b;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 24px;
+      box-shadow: 0 25px 70px rgba(0,0,0,.45);
+    }
+
+    .login-card h2 {
+      margin-top: 0;
+    }
+
+    .login-form {
+      display: grid;
+      gap: 12px;
+    }
+
+    .login-error {
+      color: #ff727a;
+      background: rgba(255,77,90,.08);
+      border: 1px solid rgba(255,77,90,.2);
+      padding: 10px;
+      border-radius: 10px;
+      font-size: .85rem;
+      display: none;
+    }
+
+    .login-info {
+      color: var(--muted);
+      font-size: .82rem;
+      line-height: 1.5;
+    }
+
+    /* =========================
+       FOOTER
+    ========================= */
+
+    .footer {
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      text-align: center;
+      padding: 25px 0 40px;
+    }
+
+    /* =========================
+       TOAST
+    ========================= */
+
+    .toast {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      z-index: 2000;
+      max-width: 350px;
+      background: #18263d;
+      border: 1px solid var(--line);
+      padding: 14px 17px;
+      border-radius: 12px;
+      box-shadow: 0 15px 40px rgba(0,0,0,.3);
+      display: none;
+    }
+
+    /* =========================
+       MOBILE
+    ========================= */
+
+    @media (max-width: 780px) {
 
       .topbar-inner {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 16px;
-        padding: 18px 0;
+        flex-wrap: wrap;
+        padding: 13px 0;
       }
-
-      .brand {
-        font-size: 1.3rem;
-        font-weight: 700;
-        letter-spacing: 0.06em;
-        text-transform: uppercase;
-      }
-
-      .brand span { color: var(--accent); }
 
       .nav {
-        display: flex;
-        gap: 18px;
-        color: var(--muted);
-        font-size: 0.95rem;
+        order: 3;
+        width: 100%;
+        justify-content: center;
       }
 
-      .nav a:hover { color: var(--text); }
-
       .hero {
-        padding: 56px 0 30px;
+        padding-top: 25px;
       }
 
       .hero-box {
-        display: grid;
-        grid-template-columns: 1.2fr 0.8fr;
-        gap: 30px;
-        align-items: center;
-        background: linear-gradient(135deg, rgba(255, 107, 53, 0.12), rgba(32, 53, 85, 0.7));
-        border: 1px solid var(--line);
-        border-radius: 24px;
-        padding: 28px;
-      }
-
-      .hero h1 {
-        font-size: clamp(2.2rem, 4vw, 4rem);
-        line-height: 1.05;
-        margin: 0 0 18px;
-      }
-
-      .hero p {
-        color: var(--muted);
-        font-size: 1.06rem;
-        line-height: 1.7;
-        margin: 0 0 22px;
-      }
-
-      .cta-row {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 12px;
-      }
-
-      .btn {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        padding: 12px 20px;
-        border-radius: 999px;
-        font-weight: 700;
-        border: 1px solid transparent;
-        transition: transform 0.2s ease, opacity 0.2s ease;
-        cursor: pointer;
-      }
-
-      .btn:hover { transform: translateY(-1px); }
-
-      .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
-
-      .btn.primary {
-        background: linear-gradient(135deg, var(--accent), var(--accent-2));
-        color: #fff;
-      }
-
-      .btn.secondary {
-        background: rgba(255, 255, 255, 0.04);
-        border-color: var(--line);
-        color: var(--text);
-      }
-
-      .hero-card {
-        background: rgba(10, 15, 26, 0.7);
-        border: 1px solid var(--line);
-        border-radius: 22px;
-        overflow: hidden;
+        grid-template-columns: 1fr;
+        padding: 20px;
       }
 
       .hero-card img {
-        width: 100%;
-        height: 280px;
-        object-fit: cover;
-        display: block;
-      }
-
-      .hero-card .info {
-        padding: 18px 20px 20px;
-      }
-
-      .label {
-        display: inline-block;
-        background: rgba(58, 210, 149, 0.14);
-        color: var(--success);
-        border: 1px solid rgba(58, 210, 149, 0.3);
-        padding: 6px 10px;
-        border-radius: 999px;
-        font-size: 0.75rem;
-        font-weight: 700;
-        letter-spacing: 0.04em;
-        text-transform: uppercase;
+        height: 220px;
       }
 
       .section-head {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin: 26px 0 18px;
-      }
-
-      .section-head h2 {
-        margin: 0;
-        font-size: clamp(1.5rem, 2vw, 2.2rem);
-      }
-
-      .filter {
-        display: flex;
-        gap: 10px;
-        flex-wrap: wrap;
-      }
-
-      .chip {
-        padding: 8px 12px;
-        border: 1px solid var(--line);
-        border-radius: 999px;
-        color: var(--muted);
-        background: rgba(255,255,255,0.02);
-        font-size: 0.82rem;
+        flex-direction: column;
+        align-items: flex-start;
       }
 
       .grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
-        gap: 24px;
-        padding-bottom: 60px;
+        grid-template-columns: 1fr;
       }
 
-      /* Formulario y badges */
-      .form-card {
-        background: rgba(10,15,26,0.6);
-        border: 1px solid var(--line);
-        padding: 18px;
-        border-radius: 16px;
-        margin-bottom: 20px;
+      .actions .btn {
+        padding: 9px 13px;
+        font-size: .8rem;
       }
 
-      .form-row {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-        gap: 12px;
-        margin-bottom: 12px;
+      .brand {
+        font-size: 1.1rem;
       }
+    }
+  </style>
+</head>
 
-      .form-row input,
-      .form-row select,
-      .form-row textarea {
-        width: 100%;
-        padding: 10px 12px;
-        border-radius: 10px;
-        background: rgba(255,255,255,0.03);
-        border: 1px solid var(--line);
-        color: var(--text);
-        font-size: 0.95rem;
-      }
+<body>
 
-      .file-input-wrap {
-        grid-column: 1 / -1;
-      }
+  <!-- =========================
+       BARRA SUPERIOR
+  ========================= -->
 
-      .file-input-wrap label {
-        display: block;
-        margin-bottom: 6px;
-        color: var(--muted);
-        font-size: 0.85rem;
-      }
+  <header class="topbar">
 
-      #mediaPreview {
-        display: flex;
-        gap: 8px;
-        flex-wrap: wrap;
-        margin-top: 10px;
-      }
+    <div class="container topbar-inner">
 
-      .badge {
-        display: inline-block;
-        padding: 6px 10px;
-        border-radius: 999px;
-        font-size: 0.78rem;
-        font-weight: 700;
-        letter-spacing: 0.04em;
-        text-transform: uppercase;
-      }
-
-      .badge.estado-alta { background: rgba(58,210,149,0.12); color: var(--success); border: 1px solid rgba(58,210,149,0.25); }
-      .badge.estado-baja { background: rgba(255,107,53,0.08); color: var(--accent); border: 1px solid rgba(255,107,53,0.18); }
-      .badge.motor-alta { background: rgba(85,150,255,0.08); color: #5fb0ff; border: 1px solid rgba(95,176,255,0.12); }
-      .badge.motor-baja { background: rgba(180,180,180,0.06); color: var(--muted); border: 1px solid rgba(255,255,255,0.03); }
-      .hidden { display: none !important; }
-
-      /* Autenticación / modal */
-      .login-modal {
-        position: fixed;
-        inset: 0;
-        display: grid;
-        place-items: center;
-        background: rgba(0,0,0,0.6);
-        z-index: 40;
-      }
-
-      .login-card {
-        width: min(420px, calc(100% - 40px));
-        background: rgba(10,15,26,0.95);
-        border: 1px solid var(--line);
-        padding: 18px;
-        border-radius: 12px;
-      }
-
-      .login-row { display:flex; gap:8px; margin-bottom:8px; }
-
-      .actions { display:flex; gap:8px; align-items:center; }
-
-      .card {
-        background: rgba(23, 37, 61, 0.9);
-        border: 1px solid var(--line);
-        border-radius: 20px;
-        overflow: hidden;
-        box-shadow: 0 14px 30px rgba(0, 0, 0, 0.18);
-      }
-
-      .video-box {
-        position: relative;
-        background: #0b1018;
-      }
-
-      .video-box video {
-        display: block;
-        width: 100%;
-        height: 220px;
-        object-fit: cover;
-        background: #000;
-      }
-
-      .card-body {
-        padding: 18px 18px 20px;
-      }
-
-      .meta-top {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 10px;
-        margin-bottom: 8px;
-      }
-
-      .meta-top h3 {
-        margin: 0;
-        font-size: 1.25rem;
-      }
-
-      .price {
-        color: var(--accent-2);
-        font-weight: 700;
-        font-size: 1.08rem;
-      }
-
-      .subtitle {
-        display: inline-block;
-        color: var(--muted);
-        font-size: 0.78rem;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-        margin-bottom: 12px;
-      }
-
-      .desc {
-        margin: 0 0 16px;
-        color: var(--muted);
-        line-height: 1.7;
-        font-size: 0.96rem;
-      }
-
-      .specs {
-        list-style: none;
-        padding: 0;
-        margin: 0 0 18px;
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-      }
-
-      .specs li {
-        background: rgba(255,255,255,0.04);
-        border: 1px solid var(--line);
-        color: var(--text);
-        padding: 7px 10px;
-        border-radius: 999px;
-        font-size: 0.78rem;
-      }
-
-      .card-actions {
-        display: flex;
-        gap: 10px;
-      }
-
-      .card-actions .btn {
-        flex: 1;
-        padding: 11px 14px;
-        font-size: 0.9rem;
-      }
-
-      .footer {
-        border-top: 1px solid var(--line);
-        padding: 20px 0 36px;
-        color: var(--muted);
-        text-align: center;
-      }
-
-      @media (max-width: 780px) {
-        .topbar-inner {
-          flex-direction: column;
-          align-items: flex-start;
-        }
-
-        .hero-box {
-          grid-template-columns: 1fr;
-        }
-
-        .nav {
-          flex-wrap: wrap;
-        }
-      }
-    </style>
-  </head>
-  <body>
-    <header class="topbar">
-        <div class="container topbar-inner">
-        <div class="brand">Moto<span>Plus</span></div>
-        <nav class="nav" aria-label="Menu principal">
-          <a href="#catalogo">Catálogo</a>
-          <a href="#vendidos">Más vendidos</a>
-          <a href="#contacto">Contacto</a>
-        </nav>
-        <div class="actions">
-          <button id="addMotoBtn" class="btn primary" style="display:none;">Agregar moto</button>
-          <button id="authBtn" class="btn secondary">Iniciar sesión</button>
-        </div>
+      <div class="brand">
+        Moto<span>Plus</span>
       </div>
-    </header>
 
-    <main class="container">
-      <section class="hero">
-        <div class="hero-box">
-          <div>
-            <div class="label">Inventario premium</div>
-            <h1>Encuentra la moto ideal para cada ruta.</h1>
-            <p>
-              Descubre modelos con fotos y videos reales, descripción detallada y precio actualizado.
-            </p>
-            <div class="cta-row">
-              <a class="btn primary" href="#catalogo">Ver catálogo</a>
-              <a class="btn secondary" href="#contacto">Solicitar información</a>
-            </div>
-          </div>
+      <nav class="nav">
+        <a href="#catalogo">Catálogo</a>
+        <a href="#admin">Administración</a>
+        <a href="#contacto">Contacto</a>
+      </nav>
 
-          <div class="hero-card" aria-label="Moto destacada">
-            <img src="https://images.unsplash.com/photo-1558980664-10e7170b5df9?auto=format&fit=crop&w=900&q=80" alt="Moto deportiva" />
-            <div class="info">
-              <div class="label">Destacada</div>
-              <h3 style="margin: 12px 0 8px; font-size: 1.3rem;">Yamaha R7</h3>
-              <div class="price">$18.900 USD</div>
-            </div>
-          </div>
-        </div>
-      </section>
+      <div class="actions">
 
-      <section id="admin" class="hidden">
-        <div class="section-head">
-          <h2>Agregar nueva moto</h2>
-        </div>
+        <button
+          id="addMotoBtn"
+          class="btn primary hidden"
+          type="button">
+          + Agregar moto
+        </button>
 
-        <div class="form-card">
-          <form id="motoForm">
-            <div class="form-row">
-              <input id="marca" name="marca" placeholder="Marca (ej: Yamaha)" required />
-              <input id="modelo" name="modelo" placeholder="Modelo (ej: R7)" required />
-              <select id="tipo" name="tipo">
-                <option value="Deportiva">Deportiva</option>
-                <option value="Trail">Trail</option>
-                <option value="Calle">Calle</option>
-                <option value="Otra">Otra</option>
-              </select>
-              <input id="precio" name="precio" placeholder="Precio (ej: $18.900 USD)" required />
-            </div>
+        <button
+          id="authBtn"
+          class="btn secondary"
+          type="button">
+          Iniciar sesión
+        </button>
 
-            <div class="form-row">
-              <select id="estado" name="estado">
-                <option value="Alta">Alta</option>
-                <option value="Baja">Baja</option>
-              </select>
-              <select id="motor" name="motor">
-                <option value="Alta">Motor Alta</option>
-                <option value="Baja">Motor Baja</option>
-              </select>
-              <input id="specs" name="specs" placeholder="Specs (separadas por comas)" />
-            </div>
-
-            <div class="form-row">
-              <div class="file-input-wrap">
-                <label for="media">Fotos y videos (podés elegir varios de una vez)</label>
-                <input id="media" name="media" type="file" accept="image/*,video/*" multiple />
-                <div id="mediaPreview"></div>
-              </div>
-            </div>
-
-            <div class="form-row">
-              <textarea id="descripcion" name="descripcion" placeholder="Descripción" rows="2"></textarea>
-              <div style="display:flex;gap:8px;align-items:center;">
-                <button class="btn primary" type="submit">Agregar moto</button>
-                <button class="btn secondary" type="button" id="resetForm">Limpiar</button>
-              </div>
-            </div>
-          </form>
-        </div>
-
-      </section>
-
-      <section id="catalogo">
-        <div class="section-head">
-          <h2>Catálogo de motos</h2>
-          <div class="filter" aria-label="Filtros">
-            <span class="chip">Todas</span>
-            <span class="chip">Deportivas</span>
-            <span class="chip">Trail</span>
-            <span class="chip">Calle</span>
-          </div>
-        </div>
-
-        <div id="motoGrid" class="grid"></div>
-      </section>
-    </main>
-
-    <footer class="footer" id="contacto">
-      <div class="container">MotoPlus © 2026 · Información y ventas por WhatsApp o contacto directo.</div>
-    </footer>
-
-    <div id="loginModal" class="login-modal hidden">
-      <div class="login-card">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-          <strong>Iniciar sesión (admin)</strong>
-          <button id="loginClose" class="btn secondary">Cerrar</button>
-        </div>
-        <form id="loginForm">
-          <div class="login-row">
-            <input name="username" placeholder="Usuario" required />
-            <input name="password" type="password" placeholder="Contraseña" required />
-          </div>
-          <div style="display:flex;gap:8px;justify-content:flex-end;">
-            <button class="btn primary" type="submit">Entrar</button>
-          </div>
-        </form>
       </div>
+
     </div>
 
-    <script type="module">
-const firebaseConfig = {
-  apiKey: "AIzaSyDOhcHcwceyTfn4Yaz1I5XoT-LyMV4_WzY",
-  authDomain: "motoconve.firebaseapp.com",
-  projectId: "motoconve",
-  storageBucket: "motoconve.firebasestorage.app",
-  messagingSenderId: "53900104453",
-  appId: "1:53900104453:web:c76349416535c123e65d6c"
-};
+  </header>
 
-const authBtn = document.getElementById('authBtn');
-const addMotoBtn = document.getElementById('addMotoBtn');
-const loginModal = document.getElementById('loginModal');
-const loginForm = document.getElementById('loginForm');
-const motoForm = document.getElementById('motoForm');
-const resetBtn = document.getElementById('resetForm');
-const grid = document.getElementById('motoGrid');
-const mediaInput = document.getElementById('media');
-const mediaPreview = document.getElementById('mediaPreview');
 
-function renderMedia(media) {
-  if (!media || !media.length) {
-    return `<div style="height:220px;display:flex;align-items:center;justify-content:center;color:var(--muted);">Sin fotos ni videos</div>`;
-  }
-  return `<div style="display:flex;overflow-x:auto;gap:4px;">
-    ${media.map(m => m.type === 'video'
-      ? `<video src="${m.url}" controls playsinline style="height:220px;width:280px;object-fit:cover;flex-shrink:0;"></video>`
-      : `<img src="${m.url}" style="height:220px;width:280px;object-fit:cover;flex-shrink:0;" />`
-    ).join('')}
-  </div>`;
-}
+  <main class="container">
 
-let isAdmin = false;
-let ultimaListaMotos = [];
+    <!-- =========================
+         HERO
+    ========================= -->
 
-function renderMotoCards(items) {
-  grid.innerHTML = items.map((moto) => `
-    <article class="card">
-      <div class="video-box">${renderMedia(moto.media)}</div>
-      <div class="card-body">
-        <div class="meta-top">
-          <h3>${moto.marca} ${moto.modelo}</h3>
-          <span class="price">${moto.precio}</span>
+    <section class="hero">
+
+      <div class="hero-box">
+
+        <div>
+
+          <span class="label">
+            Inventario premium
+          </span>
+
+          <h1>
+            Encontrá la moto ideal para cada ruta.
+          </h1>
+
+          <p>
+            Descubrí motos con fotos y videos reales,
+            especificaciones, estado, motor y precio actualizado.
+          </p>
+
+          <div class="cta-row">
+
+            <a
+              href="#catalogo"
+              class="btn primary">
+              Ver catálogo
+            </a>
+
+            <a
+              href="#contacto"
+              class="btn secondary">
+              Solicitar información
+            </a>
+
+          </div>
+
         </div>
-        <div style="display:flex;gap:8px;margin-bottom:8px;align-items:center;">
-          <span class="subtitle">${moto.tipo}</span>
-          <span class="badge ${moto.estado === 'Alta' ? 'estado-alta' : 'estado-baja'}">${moto.estado}</span>
-          <span class="badge ${moto.motor === 'Alta' ? 'motor-alta' : 'motor-baja'}">Motor ${moto.motor}</span>
+
+
+        <div class="hero-card">
+
+          <img
+            src="https://images.unsplash.com/photo-1558980664-10e7170b5df9?auto=format&fit=crop&w=900&q=80"
+            alt="Moto deportiva">
+
+          <div class="hero-info">
+
+            <span class="label">
+              Destacada
+            </span>
+
+            <h3>
+              Yamaha R7
+            </h3>
+
+            <div class="price">
+              $18.900 USD
+            </div>
+
+          </div>
+
         </div>
-        <p class="desc">${moto.descripcion || ''}</p>
-        <ul class="specs">
-          ${Array.isArray(moto.specs) ? moto.specs.map((item) => `<li>${item}</li>`).join('') : ''}
-        </ul>
-        <div class="card-actions">
-          <a class="btn primary" href="#contacto">Consultar</a>
-          <a class="btn secondary" href="#catalogo">Más info</a>
-          ${isAdmin ? `<button class="btn secondary btn-delete" data-id="${moto.id}" type="button" style="flex:0 0 auto;color:var(--accent);">Borrar</button>` : ''}
-        </div>
+
       </div>
-    </article>
-  `).join('');
-}
 
-resetBtn.addEventListener('click', () => {
-  motoForm.reset();
-  if (mediaPreview) mediaPreview.innerHTML = '';
-});
+    </section>
 
-// Vista previa de las fotos/videos elegidos antes de subir
-mediaInput?.addEventListener('change', () => {
-  if (!mediaPreview) return;
-  const files = Array.from(mediaInput.files || []);
-  mediaPreview.innerHTML = files.map(f => {
-    const url = URL.createObjectURL(f);
-    return f.type.startsWith('video')
-      ? `<video src="${url}" muted style="height:90px;width:120px;object-fit:cover;border-radius:8px;"></video>`
-      : `<img src="${url}" style="height:90px;width:120px;object-fit:cover;border-radius:8px;" />`;
-  }).join('');
-});
 
-// Datos de Cloudinary (gratis, sin necesitar tarjeta)
-const CLOUDINARY_CLOUD_NAME = 'doe1dfngf';
-const CLOUDINARY_UPLOAD_PRESET = 'motoconve';
+    <!-- =========================
+         ADMINISTRACIÓN
+    ========================= -->
 
-async function subirACloudinary(file, onProgreso) {
-  const esVideo = file.type.startsWith('video');
-  const endpoint = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/${esVideo ? 'video' : 'image'}/upload`;
+    <section
+      id="admin"
+      class="hidden">
 
-  const formData = new FormData();
-  formData.append('file', file);
-  formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+      <div class="section-head">
 
-  return new Promise((resolve, reject) => {
-    const xhr = new XMLHttpRequest();
-    xhr.open('POST', endpoint);
-    xhr.upload.addEventListener('progress', (e) => {
-      if (e.lengthComputable && onProgreso) onProgreso(Math.round((e.loaded / e.total) * 100));
-    });
-    xhr.onload = () => {
-      if (xhr.status >= 200 && xhr.status < 300) {
-        const data = JSON.parse(xhr.responseText);
-        resolve({ url: data.secure_url, type: esVideo ? 'video' : 'image' });
-      } else {
-        reject(new Error('Error al subir a Cloudinary: ' + xhr.responseText));
-      }
+        <h2>
+          Agregar nueva moto
+        </h2>
+
+      </div>
+
+
+      <div class="form-card">
+
+        <form id="motoForm">
+
+          <div class="form-row">
+
+            <input
+              id="marca"
+              name="marca"
+              placeholder="Marca (ej: Yamaha)"
+              required>
+
+            <input
+              id="modelo"
+              name="modelo"
+              placeholder="Modelo (ej: R7)"
+              required>
+
+            <select
+              id="tipo"
+              name="tipo">
+
+              <option value="Deportiva">
+                Deportiva
+              </option>
+
+              <option value="Trail">
+                Trail
+              </option>
+
+              <option value="Calle">
+                Calle
+              </option>
+
+              <option value="Otra">
+                Otra
+              </option>
+
+            </select>
+
+            <input
+              id="precio"
+              name="precio"
+              placeholder="Precio (ej: $18.900 USD)"
+              required>
+
+          </div>
+
+
+          <div class="form-row">
+
+            <select
+              id="estado"
+              name="estado">
+
+              <option value="Alta">
+                Disponible / Alta
+              </option>
+
+              <option value="Baja">
+                Baja
+              </option>
+
+            </select>
+
+
+            <select
+              id="motor"
+              name="motor">
+
+              <option value="Alta">
+                Motor Alta
+              </option>
+
+              <option value="Baja">
+                Motor Baja
+              </option>
+
+            </select>
+
+
+            <input
+              id="specs"
+              name="specs"
+              placeholder="Specs separadas por comas">
+
+          </div>
+
+
+          <div class="form-row">
+
+            <div class="file-wrap">
+
+              <label for="media">
+                Fotos y videos
+              </label>
+
+              <input
+                id="media"
+                name="media"
+                type="file"
+                accept="image/*,video/*"
+                multiple>
+
+              <div id="mediaPreview"></div>
+
+              <div
+                id="uploadStatus"
+                class="upload-status">
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <div class="form-row">
+
+            <textarea
+              id="descripcion"
+              name="descripcion"
+              placeholder="Descripción de la moto">
+            </textarea>
+
+          </div>
+
+
+          <div
+            style="display:flex;gap:10px;flex-wrap:wrap;">
+
+            <button
+              id="submitMotoBtn"
+              class="btn primary"
+              type="submit">
+              Agregar moto
+            </button>
+
+            <button
+              id="resetForm"
+              class="btn secondary"
+              type="button">
+              Limpiar
+            </button>
+
+          </div>
+
+        </form>
+
+      </div>
+
+    </section>
+
+
+    <!-- =========================
+         CATÁLOGO
+    ========================= -->
+
+    <section id="catalogo">
+
+      <div class="section-head">
+
+        <h2>
+          Catálogo de motos
+        </h2>
+
+        <div class="filter">
+
+          <button
+            class="chip active"
+            data-filter="Todas"
+            type="button">
+            Todas
+          </button>
+
+          <button
+            class="chip"
+            data-filter="Deportiva"
+            type="button">
+            Deportivas
+          </button>
+
+          <button
+            class="chip"
+            data-filter="Trail"
+            type="button">
+            Trail
+          </button>
+
+          <button
+            class="chip"
+            data-filter="Calle"
+            type="button">
+            Calle
+          </button>
+
+          <button
+            class="chip"
+            data-filter="Otra"
+            type="button">
+            Otras
+          </button>
+
+        </div>
+
+      </div>
+
+
+      <div
+        id="motoGrid"
+        class="grid">
+
+        <div
+          style="color:var(--muted);">
+          Cargando catálogo...
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <!-- =========================
+       FOOTER
+  ========================= -->
+
+  <footer
+    id="contacto"
+    class="footer">
+
+    <div class="container">
+
+      MotoPlus © 2026
+
+      <br>
+
+      Información y ventas por WhatsApp o contacto directo.
+
+    </div>
+
+  </footer>
+
+
+  <!-- =========================
+       MODAL LOGIN
+  ========================= -->
+
+  <div
+    id="loginModal"
+    class="login-modal hidden">
+
+    <div class="login-card">
+
+      <div
+        style="
+          display:flex;
+          justify-content:space-between;
+          align-items:center;
+          gap:10px;
+          margin-bottom:15px;
+        ">
+
+        <h2>
+          Acceso administrador
+        </h2>
+
+        <button
+          id="loginClose"
+          class="btn secondary"
+          type="button">
+          ×
+        </button>
+
+      </div>
+
+
+      <p class="login-info">
+        Ingresá con el correo y contraseña registrados
+        en Firebase Authentication.
+      </p>
+
+
+      <form
+        id="loginForm"
+        class="login-form">
+
+        <input
+          id="loginEmail"
+          name="email"
+          type="email"
+          placeholder="Correo electrónico"
+          autocomplete="email"
+          required>
+
+        <input
+          id="loginPassword"
+          name="password"
+          type="password"
+          placeholder="Contraseña"
+          autocomplete="current-password"
+          required>
+
+
+        <div
+          id="loginError"
+          class="login-error">
+        </div>
+
+
+        <button
+          id="loginSubmit"
+          class="btn primary"
+          type="submit">
+          Iniciar sesión
+        </button>
+
+      </form>
+
+    </div>
+
+  </div>
+
+
+  <!-- TOAST -->
+
+  <div
+    id="toast"
+    class="toast">
+  </div>
+
+
+  <!-- =========================
+       FIREBASE + CLOUDINARY
+  ========================= -->
+
+  <script type="module">
+
+    /* ==========================================================
+       FIREBASE
+    ========================================================== */
+
+    import {
+      initializeApp
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+
+    import {
+      getAuth,
+      signInWithEmailAndPassword,
+      signOut,
+      onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+
+    import {
+      getFirestore,
+      collection,
+      addDoc,
+      deleteDoc,
+      doc,
+      serverTimestamp,
+      onSnapshot
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+
+    /* ==========================================================
+       CONFIGURACIÓN FIREBASE
+    ========================================================== */
+
+    const firebaseConfig = {
+
+      apiKey:
+        "AIzaSyDOhcHcwceyTfn4Yaz1I5XoT-LyMV4_WzY",
+
+      authDomain:
+        "motoconve.firebaseapp.com",
+
+      projectId:
+        "motoconve",
+
+      storageBucket:
+        "motoconve.firebasestorage.app",
+
+      messagingSenderId:
+        "53900104453",
+
+      appId:
+        "1:53900104453:web:c76349416535c123e65d6c"
+
     };
-    xhr.onerror = () => reject(new Error('Error de red al subir a Cloudinary'));
-    xhr.send(formData);
-  });
-}
 
-(function initFirebase() {
-  import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js').then(({ initializeApp }) => {
-    import('https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js').then(({ getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged }) => {
-      import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js').then(({ getFirestore, collection, addDoc, deleteDoc, doc, serverTimestamp, query, orderBy, onSnapshot }) => {
 
-          const app = initializeApp(firebaseConfig);
-          const auth = getAuth(app);
-          const db = getFirestore(app);
+    /* ==========================================================
+       INICIALIZAR FIREBASE
+    ========================================================== */
 
-          authBtn.addEventListener('click', () => {
-            if (auth.currentUser) { signOut(auth).catch(() => {}); }
-            else { loginModal.classList.remove('hidden'); }
-          });
+    let app;
+    let auth;
+    let db;
 
-          document.getElementById('loginClose')?.addEventListener('click', () => { loginModal.classList.add('hidden'); });
+    try {
 
-          loginForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            signInWithEmailAndPassword(auth, loginForm.username.value, loginForm.password.value)
- 
+      app = initializeApp(firebaseConfig);
+
+      auth = getAuth(app);
+
+      db = getFirestore(app);
+
+      console.log("Firebase iniciado correctamente.");
+
+    } catch (error) {
+
+      console.error(
+        "Error iniciando Firebase:",
+        error
+      );
+
+      alert(
+        "No se pudo iniciar Firebase. Revisá la configuración."
+      );
+
+    }
+
+
+    /* ==========================================================
+       CLOUDINARY
+    ========================================================== */
+
+    const CLOUDINARY_CLOUD_NAME =
+      "doe1dfngf";
+
+    const CLOUDINARY_UPLOAD_PRESET =
+      "motoconve";
+
+
+    /* ==========================================================
+       ELEMENTOS
+    ========================================================== */
+
+    const authBtn =
+      document.getElementById("authBtn");
+
+    const addMotoBtn =
+      document.getElementById("addMotoBtn");
+
+    const loginModal =
+      document.getElementById("loginModal");
+
+    const loginClose =
+      document.getElementById("loginClose");
+
+    const loginForm =
+      document.getElementById("loginForm");
+
+    const loginEmail =
+      document.getElementById("loginEmail");
+
+    const loginPassword =
+      document.getElementById("loginPassword");
+
+    const loginSubmit =
+      document.getElementById("loginSubmit");
+
+    const loginError =
+      document.getElementById("loginError");
+
+    const adminSection =
+      document.getElementById("admin");
+
+    const motoForm =
+      document.getElementById("motoForm");
+
+    const resetForm =
+      document.getElementById("resetForm");
+
+    const mediaInput =
+      document.getElementById("media");
+
+    const mediaPreview =
+      document.getElementById("mediaPreview");
+
+    const uploadStatus =
+      document.getElementById("uploadStatus");
+
+    const motoGrid =
+      document.getElementById("motoGrid");
+
+    const toast =
+      document.getElementById("toast");
+
+
+    /* ==========================================================
+       VARIABLES
+    ========================================================== */
+
+    let isAdmin = false;
+
+    let motos = [];
+
+    let filtroActual = "Todas";
+
+
+    /* ==========================================================
+       TOAST
+    ========================================================== */
+
+    function mostrarToast(mensaje) {
+
+      toast.textContent = mensaje;
+
+      toast.style.display = "block";
+
+      setTimeout(() => {
+
+        toast.style.display = "none";
+
+      }, 3500);
+
+    }
+
+
+    /* ==========================================================
+       ABRIR LOGIN
+       IMPORTANTE:
+       ESTO ESTÁ FUERA DE CUALQUIER CARGA ASÍ QUE
+       EL BOTÓN FUNCIONA INMEDIATAMENTE.
+    ========================================================== */
+
+    authBtn.addEventListener(
+      "click",
+      () => {
+
+        if (auth && auth.currentUser) {
+
+          signOut(auth)
+            .then(() => {
+
+              mostrarToast(
+                "Sesión cerrada correctamente."
+              );
+
+            })
+            .catch((error) => {
+
+              console.error(error);
+
+              mostrarToast(
+                "No se pudo cerrar la sesión."
+              );
+
+            });
+
+        } else {
+
+          loginError.style.display = "none";
+
+          loginError.textContent = "";
+
+          loginModal.classList.remove(
+            "hidden"
+          );
+
+          setTimeout(() => {
+
+            loginEmail.focus();
+
+          }, 100);
+
+        }
+
+      }
+    );
+
+
+    /* ==========================================================
+       CERRAR LOGIN
+    ========================================================== */
+
+    loginClose.addEventListener(
+      "click",
+      () => {
+
+        loginModal.classList.add(
+          "hidden"
+        );
+
+      }
+    );
+
+
+    /* CERRAR TOCANDO FUERA */
+
+    loginModal.addEventListener(
+      "click",
+      (event) => {
+
+        if (
+          event.target === loginModal
+        ) {
+
+          loginModal.classList.add(
+            "hidden"
+          );
+
+        }
+
+      }
+    );
+
+
+    /* ==========================================================
+       LOGIN FIREBASE
+    ========================================================== */
+
+    loginForm.addEventListener(
+      "submit",
+      async (event) => {
+
+        event.preventDefault();
+
+        loginError.style.display =
+          "none";
+
+        loginSubmit.disabled = true;
+
+        loginSubmit.textContent =
+          "Ingresando...";
+
+
+        const email =
+          loginEmail.value.trim();
+
+        const password =
+          loginPassword.value;
+
+
+        if (!email || !password) {
+
+          loginError.textContent =
+            "Completá correo y contraseña.";
+
+          loginError.style.display =
+            "block";
+
+          loginSubmit.disabled = false;
+
+          loginSubmit.textContent =
+            "Iniciar sesión";
+
+          return;
+
+        }
+
+
+        try {
+
+          if (!auth) {
+
+            throw new Error(
+              "Firebase Authentication no está disponible."
+            );
+
+          }
+
+
+          await signInWithEmailAndPassword(
+            auth,
+            email,
+            password
+          );
+
+
+          loginModal.classList.add(
+            "hidden"
+          );
+
+          loginForm.reset();
+
+          mostrarToast(
+            "Sesión iniciada correctamente."
+          );
+
+
+        } catch (error) {
+
+          console.error(
+            "ERROR LOGIN:",
+            error
+          );
+
+
+          let mensaje =
+            "No se pudo iniciar sesión.";
+
+
+          switch (error.code) {
+
+            case "auth/invalid-credential":
+
+              mensaje =
+                "Correo o contraseña incorrectos.";
+
+              break;
+
+
+            case "auth/invalid-email":
+
+              mensaje =
+                "El correo electrónico no es válido.";
+
+              break;
+
+
+            case "auth/user-not-found":
+
+              mensaje =
+                "Ese correo no está registrado en Firebase Authentication.";
+
+              break;
+
+
+            case "auth/wrong-password":
+
+              mensaje =
+                "La contraseña es incorrecta.";
+
+              break;
+
+
+            case "auth/too-many-requests":
+
+              mensaje =
+                "Demasiados intentos. Esperá unos minutos.";
+
+              break;
+
+
+            case "auth/network-request-failed":
+
+              mensaje =
+                "Error de conexión. Revisá Internet.";
+
+              break;
+
+
+            case "auth/user-disabled":
+
+              mensaje =
+                "Este usuario está deshabilitado.";
+
+              break;
+
+
+            case "auth/operation-not-allowed":
+
+              mensaje =
+                "Email/Password no está habilitado en Firebase Authentication.";
+
+              break;
+
+
+            default:
+
+              mensaje =
+                "Error Firebase: " +
+                (error.code || error.message);
+
+          }
+
+
+          loginError.textContent =
+            mensaje;
+
+          loginError.style.display =
+            "block";
+
+
+        } finally {
+
+          loginSubmit.disabled =
+            false;
+
+          loginSubmit.textContent =
+            "Iniciar sesión";
+
+        }
+
+      }
+    );
+
+
+    /* ==========================================================
+       ESTADO DE AUTENTICACIÓN
+    ========================================================== */
+
+    if (auth) {
+
+      onAuthStateChanged(
+        auth,
+        (user) => {
+
+          isAdmin = !!user;
+
+
+          if (user) {
+
+            console.log(
+              "Administrador conectado:",
+              user.email
+            );
+
+
+            authBtn.textContent =
+              "Cerrar sesión";
+
+
+            addMotoBtn.classList.remove(
+              "hidden"
+            );
+
+
+            adminSection.classList.remove(
+              "hidden"
+            );
+
+
+          } else {
+
+            console.log(
+              "No hay sesión iniciada."
+            );
+
+
+            authBtn.textContent =
+              "Iniciar sesión";
+
+
+            addMotoBtn.classList.add(
+              "hidden"
+            );
+
+
+            adminSection.classList.add(
+              "hidden"
+            );
+
+          }
+
+
+          renderMotos();
+
+        }
+      );
+
+    }
+
+
+    /* ==========================================================
+       BOTÓN AGREGAR MOTO
+    ========================================================== */
+
+    addMotoBtn.addEventListener(
+      "click",
+      () => {
+
+        adminSection.classList.remove(
+          "hidden"
+        );
+
+        window.location.hash =
+          "#admin";
+
+        document
+          .getElementById("marca")
+          .focus();
+
+      }
+    );
+
+
+    /* ==========================================================
+       PREVISUALIZACIÓN DE ARCHIVOS
+    ========================================================== */
+
+    mediaInput.addEventListener(
+      "change",
+      () => {
+
+        mediaPreview.innerHTML = "";
+
+        const files =
+          Array.from(
+            mediaInput.files || []
+          );
+
+
+        files.forEach(
+          (file) => {
+
+            const item =
+              document.createElement(
+                "div"
+              );
+
+            item.className =
+              "preview-item";
+
+
+            const url =
+              URL.createObjectURL(
+                file
+              );
+
+
+            if (
+              file.type.startsWith(
+                "video/"
+              )
+            ) {
+
+              const video =
+                document.createElement(
+                  "video"
+                );
+
+              video.src = url;
+
+              video.muted = true;
+
+              video.controls = true;
+
+              item.appendChild(
+                video
+              );
+
+            } else {
+
+              const img =
+                document.createElement(
+                  "img"
+                );
+
+              img.src = url;
+
+              item.appendChild(
+                img
+              );
+
+            }
+
+
+            mediaPreview.appendChild(
+              item
+            );
+
+          }
+        );
+
+      }
+    );
+
+
+    /* ==========================================================
+       SUBIR A CLOUDINARY
+    ========================================================== */
+
+    async function subirACloudinary(
+      file,
+      progreso
+    ) {
+
+      const esVideo =
+        file.type.startsWith(
+          "video/"
+        );
+
+
+      const tipo =
+        esVideo
+          ? "video"
+          : "image";
+
+
+      const endpoint =
+        `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/${tipo}/upload`;
+
+
+      const formData =
+        new FormData();
+
+
+      formData.append(
+        "file",
+        file
+      );
+
+
+      formData.append(
+        "upload_preset",
+        CLOUDINARY_UPLOAD_PRESET
+      );
+
+
+      return new Promise(
+        (resolve, reject) => {
+
+          const xhr =
+            new XMLHttpRequest();
+
+
+          xhr.open(
+            "POST",
+            endpoint
+          );
+
+
+          xhr.upload.addEventListener(
+            "progress",
+            (event) => {
+
+              if (
+                event.lengthComputable
+              ) {
+
+                const porcentaje =
+                  Math.round(
+                    (
+                      event.loaded /
+                      event.total
+                    ) * 100
+                  );
+
+
+                if (progreso) {
+
+                  progreso(
+                    porcentaje
+                  );
+
+                }
+
+              }
+
+            }
+          );
+
+
+          xhr.onload =
+            () => {
+
+              if (
+                xhr.status >= 200 &&
+                xhr.status < 300
+              ) {
+
+                try {
+
+                  const data =
+                    JSON.parse(
+                      xhr.responseText
+                    );
+
+
+                  resolve({
+
+                    url:
+                      data.secure_url,
+
+                    type:
+                      esVideo
+                        ? "video"
+                        : "image"
+
+                  });
+
+                } catch (error) {
+
+                  reject(
+                    new Error(
+                      "Respuesta inválida de Cloudinary."
+                    )
+                  );
+
+                }
+
+              } else {
+
+                reject(
+                  new Error(
+                    "Cloudinary rechazó el archivo: " +
+                    xhr.responseText
+                  )
+                );
+
+              }
+
+            };
+
+
+          xhr.onerror =
+            () => {
+
+              reject(
+                new Error(
+                  "Error de conexión con Cloudinary."
+                )
+              );
+
+            };
+
+
+          xhr.send(
+            formData
+          );
+
+        }
+      );
+
+    }
+
+
+    /* ==========================================================
+       AGREGAR MOTO
+    ========================================================== */
+
+    motoForm.addEventListener(
+      "submit",
+      async (event) => {
+
+        event.preventDefault();
+
+
+        if (
+          !auth ||
+          !auth.currentUser
+        ) {
+
+          alert(
+            "Tenés que iniciar sesión como administrador."
+          );
+
+          return;
+
+        }
+
+
+        const submitButton =
+          document.getElementById(
+            "submitMotoBtn"
+          );
+
+
+        const files =
+          Array.from(
+            mediaInput.files || []
+          );
+
+
+        submitButton.disabled =
+          true;
+
+
+        uploadStatus.textContent =
+          "";
+
+
+        try {
+
+          const media = [];
+
+
+          /* SUBIR ARCHIVOS */
+
+          for (
+            let i = 0;
+            i < files.length;
+            i++
+          ) {
+
+            const file =
+              files[i];
+
+
+            submitButton.textContent =
+              `Subiendo ${i + 1}/${files.length}`;
+
+
+            const resultado =
+              await subirACloudinary(
+                file,
+                (porcentaje) => {
+
+                  uploadStatus.textContent =
+                    `Subiendo archivo ${i + 1} de ${files.length}: ${porcentaje}%`;
+
+                }
+              );
+
+
+            media.push(
+              resultado
+            );
+
+          }
+
+
+          /* DATOS */
+
+          const formData =
+            new FormData(
+              motoForm
+            );
+
+
+          const specsTexto =
+            formData.get(
+              "specs"
+            ) || "";
+
+
+          const specs =
+            specsTexto
+              .split(",")
+              .map(
+                item =>
+                  item.trim()
+              )
+              .filter(
+                Boolean
+              );
+
+
+          const nuevaMoto = {
+
+            marca:
+              formData.get(
+                "marca"
+              ) || "",
+
+            modelo:
+              formData.get(
+                "modelo"
+              ) || "",
+
+            tipo:
+              formData.get(
+                "tipo"
+              ) || "Otra",
+
+            precio:
+              formData.get(
+                "precio"
+              ) || "$0",
+
+            estado:
+              formData.get(
+                "estado"
+              ) || "Alta",
+
+            motor:
+              formData.get(
+                "motor"
+              ) || "Alta",
+
+            descripcion:
+              formData.get(
+                "descripcion"
+              ) || "",
+
+            specs:
+
+              specs,
+
+            media:
+
+              media,
+
+            createdAt:
+
+              serverTimestamp(),
+
+            createdBy:
+
+              auth.currentUser.email
+
+          };
+
+
+          /* GUARDAR FIRESTORE */
+
+          await addDoc(
+            collection(
+              db,
+              "motos"
+            ),
+            nuevaMoto
+          );
+
+
+          motoForm.reset();
+
+          mediaPreview.innerHTML =
+            "";
+
+          uploadStatus.textContent =
+            "";
+
+
+          mostrarToast(
+            "Moto agregada correctamente."
+          );
+
+
+        } catch (error) {
+
+          console.error(
+            "ERROR GUARDANDO MOTO:",
+            error
+          );
+
+
+          alert(
+            "Error al guardar la moto:\n\n" +
+            error.message
+          );
+
+
+        } finally {
+
+          submitButton.disabled =
+            false;
+
+          submitButton.textContent =
+            "Agregar moto";
+
+        }
+
+      }
+    );
+
+
+    /* ==========================================================
+       LIMPIAR FORMULARIO
+    ========================================================== */
+
+    resetForm.addEventListener(
+      "click",
+      () => {
+
+        motoForm.reset();
+
+        mediaPreview.innerHTML =
+          "";
+
+        uploadStatus.textContent =
+          "";
+
+      }
+    );
+
+
+    /* ==========================================================
+       ESCAPAR HTML
+    ========================================================== */
+
+    function escapeHTML(
+      valor
+    ) {
+
+      if (
+        valor === null ||
+        valor === undefined
+      ) {
+
+        return "";
+
+      }
+
+
+      return String(valor)
+        .replace(
+          /&/g,
+          "&amp;"
+        )
+        .replace(
+          /</g,
+          "&lt;"
+        )
+        .replace(
+          />/g,
+          "&gt;"
+        )
+        .replace(
+          /"/g,
+          "&quot;"
+        )
+        .replace(
+          /'/g,
+          "&#039;"
+        );
+
+    }
+
+
+    /* ==========================================================
+       MEDIA DE LA MOTO
+    ========================================================== */
+
+    function renderMedia(
+      media
+    ) {
+
+      if (
+        !Array.isArray(media) ||
+        media.length === 0
+      ) {
+
+        return `
+          <div class="no-media">
+            Sin fotos ni videos
+          </div>
+        `;
+
+      }
+
+
+      return `
+        <div class="media-list">
+
+          ${media.map(
+            item => {
+
+              const url =
+                escapeHTML(
+                  item.url
+                );
+
+
+              if (
+                item.type ===
+                "video"
+              ) {
+
+                return `
+                  <video
+                    src="${url}"
+                    controls
+                    playsinline>
+                  </video>
+                `;
+
+              }
+
+
+              return `
+                <img
+                  src="${url}"
+                  alt="Foto de la moto"
+                  loading="lazy">
+              `;
+
+            }
+          ).join("")}
+
+        </div>
+      `;
+
+    }
+
+
+    /* ==========================================================
+       MOSTRAR MOTOS
+    ========================================================== */
+
+    function renderMotos() {
+
+      let lista =
+        [...motos];
+
+
+      if (
+        filtroActual !==
+        "Todas"
+      ) {
+
+        lista =
+          lista.filter(
+            moto =>
+              moto.tipo ===
+              filtroActual
+          );
+
+      }
+
+
+      if (
+        lista.length === 0
+      ) {
+
+        motoGrid.innerHTML = `
+          <div
+            style="
+              grid-column:1/-1;
+              text-align:center;
+              padding:50px;
+              color:var(--muted);
+            ">
+
+            No hay motos disponibles
+            en esta categoría.
+
+          </div>
+        `;
+
+        return;
+
+      }
+
+
+      motoGrid.innerHTML =
+        lista.map(
+          moto => {
+
+            const specs =
+              Array.isArray(
+                moto.specs
+              )
+                ? moto.specs
+                : [];
+
+
+            return `
+
+              <article class="card">
+
+                <div class="media-box">
+
+                  ${renderMedia(
+                    moto.media
+                  )}
+
+                </div>
+
+
+                <div class="card-body">
+
+                  <div class="meta-top">
+
+                    <h3>
+                      ${escapeHTML(
+                        moto.marca
+                      )}
+                      ${escapeHTML(
+                        moto.modelo
+                      )}
+                    </h3>
+
+                    <span class="price">
+                      ${escapeHTML(
+                        moto.precio
+                      )}
+                    </span>
+
+                  </div>
+
+
+                  <div class="badges">
+
+                    <span class="subtitle">
+                      ${escapeHTML(
+                        moto.tipo
+                      )}
+                    </span>
+
+
+                    <span class="
+                      badge
+                      ${
+                        moto.estado ===
+                        "Alta"
+                          ? "alta"
+                          : "baja"
+                      }
+                    ">
+
+                      ${escapeHTML(
+                        moto.estado
+                      )}
+
+                    </span>
+
+
+                    <span class="
+                      badge
+                      motor
+                    ">
+
+                      Motor
+                      ${escapeHTML(
+                        moto.motor
+                      )}
+
+                    </span>
+
+                  </div>
+
+
+                  <p class="desc">
+
+                    ${escapeHTML(
+                      moto.descripcion ||
+                      ""
+                    )}
+
+                  </p>
+
+
+                  <ul class="specs">
+
+                    ${specs.map(
+                      spec => `
+
+                        <li>
+                          ${escapeHTML(
+                            spec
+                          )}
+                        </li>
+
+                      `
+                    ).join("")}
+
+                  </ul>
+
+
+                  <div class="card-actions">
+
+                    <a
+                      class="btn primary"
+                      href="#contacto">
+
+                      Consultar
+
+                    </a>
+
+
+                    ${
+                      isAdmin
+                        ? `
+
+                          <button
+                            class="btn danger btn-delete"
+                            data-id="${escapeHTML(
+                              moto.id
+                            )}"
+                            type="button">
+
+                            Borrar
+
+                          </button>
+
+                        `
+                        : ""
+
+                    }
+
+                  </div>
+
+                </div>
+
+              </article>
+
+            `;
+
+          }
+        ).join("");
+
+    }
+
+
+    /* ==========================================================
+       ESCUCHAR FIRESTORE
+    ========================================================== */
+
+    if (db) {
+
+      onSnapshot(
+
+        collection(
+          db,
+          "motos"
+        ),
+
+        (snapshot) => {
+
+          motos =
+            snapshot.docs.map(
+              documento => ({
+
+                id:
+                  documento.id,
+
+                ...documento.data()
+
+              })
+            );
+
+
+          /* Ordenar por fecha */
+
+          motos.sort(
+            (a,b) => {
+
+              const fechaA =
+                a.createdAt?.seconds ||
+                0;
+
+              const fechaB =
+                b.createdAt?.seconds ||
+                0;
+
+
+              return (
+                fechaB -
+                fechaA
+              );
+
+            }
+          );
+
+
+          renderMotos();
+
+        },
+
+
+        (error) => {
+
+          console.error(
+            "ERROR FIRESTORE:",
+            error
+          );
+
+
+          motoGrid.innerHTML = `
+
+            <div
+              style="
+                grid-column:1/-1;
+                color:#ff727a;
+                padding:30px;
+                text-align:center;
+              ">
+
+              Error cargando las motos.
+
+              <br><br>
+
+              ${escapeHTML(
+                error.message
+              )}
+
+            </div>
+
+          `;
+
+        }
+
+      );
+
+    }
+
+
+    /* ==========================================================
+       BORRAR MOTO
+    ========================================================== */
+
+    motoGrid.addEventListener(
+      "click",
+      async (event) => {
+
+        const button =
+          event.target.closest(
+            ".btn-delete"
+          );
+
+
+        if (!button) {
+          return;
+        }
+
+
+        if (
+          !auth ||
+          !auth.currentUser
+        ) {
+
+          alert(
+            "No tenés permisos."
+          );
+
+          return;
+
+        }
+
+
+        const id =
+          button.dataset.id;
+
+
+        const moto =
+          motos.find(
+            item =>
+              item.id === id
+          );
+
+
+        if (!moto) {
+          return;
+        }
+
+
+        const confirmar =
+          confirm(
+            `¿Querés borrar ${moto.marca} ${moto.modelo}?`
+          );
+
+
+        if (!confirmar) {
+          return;
+        }
+
+
+        button.disabled =
+          true;
+
+        button.textContent =
+          "Borrando...";
+
+
+        try {
+
+          await deleteDoc(
+            doc(
+              db,
+              "motos",
+              id
+            )
+          );
+
+
+          mostrarToast(
+            "Moto eliminada."
+          );
+
+
+        } catch (error) {
+
+          console.error(
+            error
+          );
+
+
+          alert(
+            "No se pudo borrar:\n\n" +
+            error.message
+          );
+
+
+          button.disabled =
+            false;
+
+          button.textContent =
+            "Borrar";
+
+        }
+
+      }
+    );
+
+
+    /* ==========================================================
+       FILTROS
+    ========================================================== */
+
+    document
+      .querySelectorAll(
+        ".chip"
+      )
+      .forEach(
+        chip => {
+
+          chip.addEventListener(
+            "click",
+            () => {
+
+              document
+                .querySelectorAll(
+                  ".chip"
+                )
+                .forEach(
+                  item =>
+                    item.classList.remove(
+                      "active"
+                    )
+                );
+
+
+              chip.classList.add(
+                "active"
+              );
+
+
+              filtroActual =
+                chip.dataset.filter;
+
+
+              renderMotos();
+
+            }
+          );
+
+        }
+      );
+
+
+    /* ==========================================================
+       MENSAJE INICIAL
+    ========================================================== */
+
+    console.log(
+      "MotoPlus iniciado."
+    );
+
+    console.log(
+      "Cloudinary:",
+      CLOUDINARY_CLOUD_NAME
+    );
+
+    console.log(
+      "Upload preset:",
+      CLOUDINARY_UPLOAD_PRESET
+    );
+
+  </script>
+
+</body>
+</html>

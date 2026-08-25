@@ -555,6 +555,9 @@ function renderMedia(media) {
   </div>`;
 }
 
+let isAdmin = false;
+let ultimaListaMotos = [];
+
 function renderMotoCards(items) {
   grid.innerHTML = items.map((moto) => `
     <article class="card">
@@ -576,6 +579,7 @@ function renderMotoCards(items) {
         <div class="card-actions">
           <a class="btn primary" href="#contacto">Consultar</a>
           <a class="btn secondary" href="#catalogo">Más info</a>
+          ${isAdmin ? `<button class="btn secondary btn-delete" data-id="${moto.id}" type="button" style="flex:0 0 auto;color:var(--accent);">Borrar</button>` : ''}
         </div>
       </div>
     </article>
@@ -602,8 +606,8 @@ mediaInput?.addEventListener('change', () => {
 (function initFirebase() {
   import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js').then(({ initializeApp }) => {
     import('https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js').then(({ getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged }) => {
-      import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js').then(({ getFirestore, collection, addDoc, serverTimestamp, query, orderBy, onSnapshot }) => {
-        import('https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js').then(({ getStorage, ref, uploadBytes, getDownloadURL }) => {
+      import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js').then(({ getFirestore, collection, addDoc, deleteDoc, doc, serverTimestamp, query, orderBy, onSnapshot }) => {
+        import('https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js').then(({ getStorage, ref, uploadBytes, getDownloadURL, deleteObject }) => {
 
           const app = initializeApp(firebaseConfig);
           const auth = getAuth(app);
@@ -628,6 +632,37 @@ mediaInput?.addEventListener('change', () => {
             document.getElementById('admin').classList.toggle('hidden', !user);
             authBtn.textContent = user ? 'Cerrar sesión' : 'Iniciar sesión';
             addMotoBtn.style.display = user ? 'inline-flex' : 'none';
+            isAdmin = !!user;
+            renderMotoCards(ultimaListaMotos);
+          });
+
+          grid.addEventListener('click', async (e) => {
+            const btn = e.target.closest('.btn-delete');
+            if (!btn) return;
+            const id = btn.dataset.id;
+            const moto = ultimaListaMotos.find((m) => m.id === id);
+            if (!moto) return;
+            if (!confirm(`¿Borrar ${moto.marca} ${moto.modelo}? Esta acción no se puede deshacer.`)) return;
+
+            btn.disabled = true;
+            btn.textContent = 'Borrando...';
+            try {
+              if (Array.isArray(moto.media)) {
+                for (const m of moto.media) {
+                  try {
+                    const path = decodeURIComponent(new URL(m.url).pathname.split('/o/')[1].split('?')[0]);
+                    await deleteObject(ref(storage, path));
+                  } catch (mediaErr) {
+                    console.warn('No se pudo borrar un archivo de Storage:', mediaErr);
+                  }
+                }
+              }
+              await deleteDoc(doc(db, 'motos', id));
+            } catch (err) {
+              alert('Error al borrar: ' + (err.message || err));
+              btn.disabled = false;
+              btn.textContent = 'Borrar';
+            }
           });
 
           addMotoBtn?.addEventListener('click', () => {
@@ -695,8 +730,8 @@ mediaInput?.addEventListener('change', () => {
 
           const q = query(collection(db, 'motos'), orderBy('createdAt', 'desc'));
           onSnapshot(q, (snapshot) => {
-            const motoData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            renderMotoCards(motoData);
+            ultimaListaMotos = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+            renderMotoCards(ultimaListaMotos);
           }, (err) => console.error('Error escuchando Firestore:', err));
 
         });

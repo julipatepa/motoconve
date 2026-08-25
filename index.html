@@ -114,9 +114,12 @@
         font-weight: 700;
         border: 1px solid transparent;
         transition: transform 0.2s ease, opacity 0.2s ease;
+        cursor: pointer;
       }
 
       .btn:hover { transform: translateY(-1px); }
+
+      .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
 
       .btn.primary {
         background: linear-gradient(135deg, var(--accent), var(--accent-2));
@@ -220,6 +223,24 @@
         border: 1px solid var(--line);
         color: var(--text);
         font-size: 0.95rem;
+      }
+
+      .file-input-wrap {
+        grid-column: 1 / -1;
+      }
+
+      .file-input-wrap label {
+        display: block;
+        margin-bottom: 6px;
+        color: var(--muted);
+        font-size: 0.85rem;
+      }
+
+      #mediaPreview {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-top: 10px;
       }
 
       .badge {
@@ -395,8 +416,7 @@
             <div class="label">Inventario premium</div>
             <h1>Encuentra la moto ideal para cada ruta.</h1>
             <p>
-              Descubre modelos con videos reales, descripción detallada y precio actualizado.
-              Esta estructura está lista para conectarse a Firebase y mostrar tu base de datos sin complicarte.
+              Descubre modelos con fotos y videos reales, descripción detallada y precio actualizado.
             </p>
             <div class="cta-row">
               <a class="btn primary" href="#catalogo">Ver catálogo</a>
@@ -435,7 +455,6 @@
             </div>
 
             <div class="form-row">
-              <input id="video" name="video" placeholder="URL del video (mp4)" />
               <select id="estado" name="estado">
                 <option value="Alta">Alta</option>
                 <option value="Baja">Baja</option>
@@ -445,6 +464,14 @@
                 <option value="Baja">Motor Baja</option>
               </select>
               <input id="specs" name="specs" placeholder="Specs (separadas por comas)" />
+            </div>
+
+            <div class="form-row">
+              <div class="file-input-wrap">
+                <label for="media">Fotos y videos (podés elegir varios de una vez)</label>
+                <input id="media" name="media" type="file" accept="image/*,video/*" multiple />
+                <div id="mediaPreview"></div>
+              </div>
             </div>
 
             <div class="form-row">
@@ -496,171 +523,187 @@
       </div>
     </div>
 
-    <script>
-      // Firebase config (desde consola)
-      const firebaseConfig = {
-        apiKey: "AIzaSyDOhcHcwceyTfn4Yaz1I5XoT-LyMV4_WzY",
-        authDomain: "motoconve.firebaseapp.com",
-        projectId: "motoconve",
-        storageBucket: "motoconve.firebasestorage.app",
-        messagingSenderId: "53900104453",
-        appId: "1:53900104453:web:c76349416535c123e65d6c"
-      };
+    <script type="module">
+const firebaseConfig = {
+  apiKey: "AIzaSyDOhcHcwceyTfn4Yaz1I5XoT-LyMV4_WzY",
+  authDomain: "motoconve.firebaseapp.com",
+  projectId: "motoconve",
+  storageBucket: "motoconve.firebasestorage.app",
+  messagingSenderId: "53900104453",
+  appId: "1:53900104453:web:c76349416535c123e65d6c"
+};
 
-      const authBtn = document.getElementById('authBtn');
-      const addMotoBtn = document.getElementById('addMotoBtn');
-      const loginModal = document.getElementById('loginModal');
-      const loginForm = document.getElementById('loginForm');
+const authBtn = document.getElementById('authBtn');
+const addMotoBtn = document.getElementById('addMotoBtn');
+const loginModal = document.getElementById('loginModal');
+const loginForm = document.getElementById('loginForm');
+const motoForm = document.getElementById('motoForm');
+const resetBtn = document.getElementById('resetForm');
+const grid = document.getElementById('motoGrid');
+const mediaInput = document.getElementById('media');
+const mediaPreview = document.getElementById('mediaPreview');
 
-      // Fallback local data in case Firebase no está disponible
-      const defaultMotos = [
-        { marca: 'Yamaha', modelo: 'R7', tipo: 'Deportiva', precio: '$18.900 USD', descripcion: 'Moto deportiva con diseño agresivo, excelente aceleración y una postura ideal para ciudad y carretera.', video: 'https://cdn.coverr.co/videos/coverr-motorcycle-riding-1561112998335/1080p.mp4', specs: ['710cc', '6 velocidades', 'ABS', '2026'], estado: 'Alta', motor: 'Alta' },
-        { marca: 'Honda', modelo: 'CB500X', tipo: 'Trail', precio: '$15.300 USD', descripcion: 'Versátil para recorridos largos, cómoda para el día a día y muy confiable en todo tipo de caminos.', video: 'https://cdn.coverr.co/videos/coverr-motorcycle-on-the-road-1561051853492/1080p.mp4', specs: ['471cc', 'Doble propósito', 'Suspensión alta', '2025'], estado: 'Alta', motor: 'Baja' }
-      ];
+function renderMedia(media) {
+  if (!media || !media.length) {
+    return `<div style="height:220px;display:flex;align-items:center;justify-content:center;color:var(--muted);">Sin fotos ni videos</div>`;
+  }
+  return `<div style="display:flex;overflow-x:auto;gap:4px;">
+    ${media.map(m => m.type === 'video'
+      ? `<video src="${m.url}" controls playsinline style="height:220px;width:280px;object-fit:cover;flex-shrink:0;"></video>`
+      : `<img src="${m.url}" style="height:220px;width:280px;object-fit:cover;flex-shrink:0;" />`
+    ).join('')}
+  </div>`;
+}
 
-      let motoData = [];
-      const grid = document.getElementById('motoGrid');
+function renderMotoCards(items) {
+  grid.innerHTML = items.map((moto) => `
+    <article class="card">
+      <div class="video-box">${renderMedia(moto.media)}</div>
+      <div class="card-body">
+        <div class="meta-top">
+          <h3>${moto.marca} ${moto.modelo}</h3>
+          <span class="price">${moto.precio}</span>
+        </div>
+        <div style="display:flex;gap:8px;margin-bottom:8px;align-items:center;">
+          <span class="subtitle">${moto.tipo}</span>
+          <span class="badge ${moto.estado === 'Alta' ? 'estado-alta' : 'estado-baja'}">${moto.estado}</span>
+          <span class="badge ${moto.motor === 'Alta' ? 'motor-alta' : 'motor-baja'}">Motor ${moto.motor}</span>
+        </div>
+        <p class="desc">${moto.descripcion || ''}</p>
+        <ul class="specs">
+          ${Array.isArray(moto.specs) ? moto.specs.map((item) => `<li>${item}</li>`).join('') : ''}
+        </ul>
+        <div class="card-actions">
+          <a class="btn primary" href="#contacto">Consultar</a>
+          <a class="btn secondary" href="#catalogo">Más info</a>
+        </div>
+      </div>
+    </article>
+  `).join('');
+}
 
-      function renderMotoCards(items) {
-        grid.innerHTML = items.map((moto, idx) => `
-          <article class="card">
-            <div class="video-box">
-              ${moto.video ? `<video controls preload="metadata" playsinline muted>
-                <source src="${moto.video}" type="video/mp4" />
-                Tu navegador no soporta videos HTML5.
-              </video>` : `<div style="height:220px;display:flex;align-items:center;justify-content:center;color:var(--muted);">Sin video disponible</div>`}
-            </div>
-            <div class="card-body">
-              <div class="meta-top">
-                <h3>${moto.marca} ${moto.modelo}</h3>
-                <span class="price">${moto.precio}</span>
-              </div>
-              <div style="display:flex;gap:8px;margin-bottom:8px;align-items:center;">
-                <span class="subtitle">${moto.tipo}</span>
-                <span class="badge ${moto.estado === 'Alta' ? 'estado-alta' : 'estado-baja'}">${moto.estado}</span>
-                <span class="badge ${moto.motor === 'Alta' ? 'motor-alta' : 'motor-baja'}">Motor ${moto.motor}</span>
-              </div>
-              <p class="desc">${moto.descripcion || ''}</p>
-              <ul class="specs">
-                ${Array.isArray(moto.specs) ? moto.specs.map((item) => `<li>${item}</li>`).join('') : ''}
-              </ul>
-              <div class="card-actions">
-                <a class="btn primary" href="#contacto">Consultar</a>
-                <a class="btn secondary" href="#catalogo">Más info</a>
-              </div>
-            </div>
-          </article>
-        `).join('');
-      }
+resetBtn.addEventListener('click', () => {
+  motoForm.reset();
+  if (mediaPreview) mediaPreview.innerHTML = '';
+});
 
-      // Form handling (will write to Firestore when available)
-      const motoForm = document.getElementById('motoForm');
-      const resetBtn = document.getElementById('resetForm');
+// Vista previa de las fotos/videos elegidos antes de subir
+mediaInput?.addEventListener('change', () => {
+  if (!mediaPreview) return;
+  const files = Array.from(mediaInput.files || []);
+  mediaPreview.innerHTML = files.map(f => {
+    const url = URL.createObjectURL(f);
+    return f.type.startsWith('video')
+      ? `<video src="${url}" muted style="height:90px;width:120px;object-fit:cover;border-radius:8px;"></video>`
+      : `<img src="${url}" style="height:90px;width:120px;object-fit:cover;border-radius:8px;" />`;
+  }).join('');
+});
 
-      function attachFormHandler(saveFn) {
-        motoForm.addEventListener('submit', (e) => {
-          e.preventDefault();
-          const form = e.target;
-          const formData = new FormData(form);
-          const newMoto = {
-            marca: formData.get('marca') || 'Marca',
-            modelo: formData.get('modelo') || 'Modelo',
-            tipo: formData.get('tipo') || 'Otra',
-            precio: formData.get('precio') || '$0',
-            descripcion: formData.get('descripcion') || '',
-            video: formData.get('video') || '',
-            specs: (formData.get('specs') || '').split(',').map(s => s.trim()).filter(Boolean),
-            estado: formData.get('estado') || 'Alta',
-            motor: formData.get('motor') || 'Alta',
-            createdAt: new Date().toISOString()
-          };
-          saveFn(newMoto).then(() => { form.reset(); });
-        });
-      }
+(function initFirebase() {
+  import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js').then(({ initializeApp }) => {
+    import('https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js').then(({ getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged }) => {
+      import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js').then(({ getFirestore, collection, addDoc, serverTimestamp, query, orderBy, onSnapshot }) => {
+        import('https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js').then(({ getStorage, ref, uploadBytes, getDownloadURL }) => {
 
-      resetBtn.addEventListener('click', () => { motoForm.reset(); });
+          const app = initializeApp(firebaseConfig);
+          const auth = getAuth(app);
+          const db = getFirestore(app);
+          const storage = getStorage(app);
 
-      // Initialize Firebase and wire Auth + Firestore
-      (function initFirebase() {
-        if (!firebaseConfig || !firebaseConfig.apiKey) {
-          // No config: render defaults
-          motoData = defaultMotos.slice();
-          renderMotoCards(motoData);
-          return;
-        }
+          authBtn.addEventListener('click', () => {
+            if (auth.currentUser) { signOut(auth).catch(() => {}); }
+            else { loginModal.classList.remove('hidden'); }
+          });
 
-        import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js').then(({ initializeApp }) => {
-          import('https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js').then(({ getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged }) => {
-            import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js').then(({ getFirestore, collection, addDoc, serverTimestamp, query, orderBy, onSnapshot }) => {
-              const app = initializeApp(firebaseConfig);
-              const auth = getAuth(app);
-              const db = getFirestore(app);
+          document.getElementById('loginClose')?.addEventListener('click', () => { loginModal.classList.add('hidden'); });
 
-              // Auth UI
-              authBtn.addEventListener('click', () => {
-                const user = auth.currentUser;
-                if (user) {
-                  signOut(auth).catch(() => {});
-                } else {
-                  loginModal.classList.remove('hidden');
-                }
-              });
+          loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            signInWithEmailAndPassword(auth, loginForm.username.value, loginForm.password.value)
+              .then(() => { loginModal.classList.add('hidden'); loginForm.reset(); })
+              .catch((err) => alert('Error de autenticación: ' + (err.message || err)));
+          });
 
-              document.getElementById('loginClose')?.addEventListener('click', () => { loginModal.classList.add('hidden'); });
+          onAuthStateChanged(auth, (user) => {
+            document.getElementById('admin').classList.toggle('hidden', !user);
+            authBtn.textContent = user ? 'Cerrar sesión' : 'Iniciar sesión';
+            addMotoBtn.style.display = user ? 'inline-flex' : 'none';
+          });
 
-              loginForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                const u = loginForm.username.value;
-                const p = loginForm.password.value;
-                signInWithEmailAndPassword(auth, u, p).then(() => {
-                  loginModal.classList.add('hidden');
-                  loginForm.reset();
-                }).catch((err) => { alert('Error de autenticación: ' + (err.message || err)); });
-              });
+          addMotoBtn?.addEventListener('click', () => {
+            document.getElementById('admin').classList.remove('hidden');
+            document.getElementById('marca')?.focus();
+            window.location.hash = '#admin';
+          });
 
-              onAuthStateChanged(auth, (user) => {
-                if (user) {
-                  // usuario logueado
-                  document.getElementById('admin').classList.remove('hidden');
-                  authBtn.textContent = 'Cerrar sesión';
-                  addMotoBtn.style.display = 'inline-flex';
-                } else {
-                  document.getElementById('admin').classList.add('hidden');
-                  authBtn.textContent = 'Iniciar sesión';
-                  addMotoBtn.style.display = 'none';
-                }
-              });
+          async function subirArchivos(files) {
+            const media = [];
+            for (const file of files) {
+              // Nombre único y sin espacios/caracteres raros para evitar errores en Storage
+              const nombreLimpio = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+              const fileRef = ref(storage, `motos/${Date.now()}_${nombreLimpio}`);
+              await uploadBytes(fileRef, file);
+              const url = await getDownloadURL(fileRef);
+              media.push({ url, type: file.type.startsWith('video') ? 'video' : 'image' });
+            }
+            return media;
+          }
 
-              addMotoBtn?.addEventListener('click', () => { document.getElementById('admin').classList.remove('hidden'); document.getElementById('marca')?.focus(); window.location.hash = '#admin'; });
+          motoForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const form = e.target;
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const files = mediaInput?.files ? Array.from(mediaInput.files) : [];
 
-              // Save function to Firestore
-              async function saveToFirestore(moto) {
-                const docRef = await addDoc(collection(db, 'motos'), { ...moto, createdAt: serverTimestamp() });
-                return docRef;
+            submitBtn.disabled = true;
+
+            try {
+              const media = [];
+              for (let i = 0; i < files.length; i++) {
+                submitBtn.textContent = `Subiendo ${i + 1}/${files.length}...`;
+                const nombreLimpio = files[i].name.replace(/[^a-zA-Z0-9._-]/g, '_');
+                const fileRef = ref(storage, `motos/${Date.now()}_${nombreLimpio}`);
+                await uploadBytes(fileRef, files[i]);
+                const url = await getDownloadURL(fileRef);
+                media.push({ url, type: files[i].type.startsWith('video') ? 'video' : 'image' });
               }
 
-              // Attach form handler to save to Firestore
-              attachFormHandler(saveToFirestore);
+              const formData = new FormData(form);
+              const newMoto = {
+                marca: formData.get('marca') || 'Marca',
+                modelo: formData.get('modelo') || 'Modelo',
+                tipo: formData.get('tipo') || 'Otra',
+                precio: formData.get('precio') || '$0',
+                descripcion: formData.get('descripcion') || '',
+                specs: (formData.get('specs') || '').split(',').map(s => s.trim()).filter(Boolean),
+                estado: formData.get('estado') || 'Alta',
+                motor: formData.get('motor') || 'Alta',
+                media,
+                createdAt: serverTimestamp()
+              };
 
-              // Real-time listener for motos collection
-              const q = query(collection(db, 'motos'), orderBy('createdAt', 'desc'));
-              onSnapshot(q, (snapshot) => {
-                motoData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                renderMotoCards(motoData);
-              }, (err) => {
-                console.error('Error escuchando Firestore:', err);
-                // fallback: render defaults
-                motoData = defaultMotos.slice();
-                renderMotoCards(motoData);
-              });
-            });
+              await addDoc(collection(db, 'motos'), newMoto);
+              form.reset();
+              if (mediaPreview) mediaPreview.innerHTML = '';
+            } catch (err) {
+              alert('Error al guardar: ' + (err.message || err));
+            } finally {
+              submitBtn.disabled = false;
+              submitBtn.textContent = 'Agregar moto';
+            }
           });
-        }).catch((err) => {
-          console.error('Error inicializando Firebase:', err);
-          motoData = defaultMotos.slice();
-          renderMotoCards(motoData);
+
+          const q = query(collection(db, 'motos'), orderBy('createdAt', 'desc'));
+          onSnapshot(q, (snapshot) => {
+            const motoData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            renderMotoCards(motoData);
+          }, (err) => console.error('Error escuchando Firestore:', err));
+
         });
-      })();
+      });
+    });
+  });
+})();
     </script>
   </body>
 </html>

@@ -683,10 +683,9 @@ Consultanos por WhatsApp para conocer las unidades disponibles y recibir más in
               <input id="marca" name="marca" placeholder="Marca (ej: Yamaha)" required />
               <input id="modelo" name="modelo" placeholder="Modelo (ej: R7)" required />
               <select id="tipo" name="tipo">
-                <option value="Deportiva">Deportiva</option>
-                <option value="Trail">Trail</option>
-                <option value="Calle">Calle</option>
-                <option value="Otra">Otra</option>
+                <option value="110">110</option>
+                <option value="150">150</option>
+                <option value="250">250 o mas</option>
               </select>
               <input id="precio" name="precio" placeholder="Precio (ej: $18.900 USD)" required />
             </div>
@@ -748,10 +747,10 @@ Consultanos por WhatsApp para conocer las unidades disponibles y recibir más in
           <div class="section-head">
           <h2>Ofertas exclusivas en motos</h2>
             <div class="filter" aria-label="Filtros">
-            <span class="chip active" data-tipo="">Ofertas</span>
-            <span class="chip" data-tipo="Deportiva">Deportivas</span>
-            <span class="chip" data-tipo="Trail">Trail</span>
-            <span class="chip" data-tipo="Calle">Calle</span>
+            <span class="chip active" data-tipo="">Todos</span>
+            <span class="chip" data-tipo="110">110</span>
+            <span class="chip" data-tipo="150">150</span>
+            <span class="chip" data-tipo="250">250 o mas</span>
             <select id="filtroMarca" class="chip-select" aria-label="Filtrar por marca">
               <option value="">Todas las marcas</option>
             </select>
@@ -877,8 +876,8 @@ Consultanos por WhatsApp para conocer las unidades disponibles y recibir más in
 
       // Fallback local por si Firebase no está disponible
       const defaultMotos = [
-        { id: 'default-1', marca: 'Yamaha', modelo: 'R7', tipo: 'Deportiva', precio: '$18.900 USD', anio: '2024', descripcion: 'Rendimiento de pista y comodidad urbana. Entrega rápida y garantía oficial.', video: 'https://cdn.coverr.co/videos/coverr-motorcycle-riding-1561112998335/1080p.mp4', foto: 'https://images.unsplash.com/photo-1558980664-10e7170b5df9?auto=format&fit=crop&w=1200&q=80', specs: ['710cc', '6 velocidades', 'ABS', '2024'], estado: 'Alta', motor: 'Alta', formulario: '08', destacada: true },
-        { id: 'default-2', marca: 'Honda', modelo: 'CB500X', tipo: 'Trail', precio: '$15.300 USD', anio: '2025', descripcion: 'Perfecta para aventuras y trayectos diarios — confiable y con excelente autonomía.', video: 'https://cdn.coverr.co/videos/coverr-motorcycle-on-the-road-1561051853492/1080p.mp4', foto: 'https://images.unsplash.com/photo-1558981001-989a4dc2b7cb?auto=format&fit=crop&w=1200&q=80', specs: ['471cc', 'Doble propósito', 'Suspensión alta', '2025'], estado: 'Alta', motor: 'Baja', formulario: '04', destacada: false }
+        { id: 'default-1', marca: 'Yamaha', modelo: 'R7', tipo: '250', precio: '$18.900 USD', anio: '2024', descripcion: 'Rendimiento de pista y comodidad urbana. Entrega rápida y garantía oficial.', video: 'https://cdn.coverr.co/videos/coverr-motorcycle-riding-1561112998335/1080p.mp4', foto: 'https://images.unsplash.com/photo-1558980664-10e7170b5df9?auto=format&fit=crop&w=1200&q=80', specs: ['710cc', '6 velocidades', 'ABS', '2024'], estado: 'Alta', motor: 'Alta', formulario: '08', destacada: true },
+        { id: 'default-2', marca: 'Honda', modelo: 'CB500X', tipo: '150', precio: '$15.300 USD', anio: '2025', descripcion: 'Perfecta para aventuras y trayectos diarios — confiable y con excelente autonomía.', video: 'https://cdn.coverr.co/videos/coverr-motorcycle-on-the-road-1561051853492/1080p.mp4', foto: 'https://images.unsplash.com/photo-1558981001-989a4dc2b7cb?auto=format&fit=crop&w=1200&q=80', specs: ['471cc', 'Doble propósito', 'Suspensión alta', '2025'], estado: 'Alta', motor: 'Baja', formulario: '04', destacada: false }
       ];
 
       // ---- Render de tarjetas del catálogo ----
@@ -1104,7 +1103,7 @@ Consultanos por WhatsApp para conocer las unidades disponibles y recibir más in
         editingId = moto.id;
         document.getElementById('marca').value = moto.marca || '';
         document.getElementById('modelo').value = moto.modelo || '';
-        document.getElementById('tipo').value = moto.tipo || 'Deportiva';
+        document.getElementById('tipo').value = moto.tipo || '110';
         document.getElementById('precio').value = moto.precio || '';
         document.getElementById('anio').value = moto.anio || '';
         document.getElementById('video').value = moto.video || '';
@@ -1202,7 +1201,7 @@ Consultanos por WhatsApp para conocer las unidades disponibles y recibir más in
             const moto = {
               marca: formData.get('marca') || 'Marca',
               modelo: formData.get('modelo') || 'Modelo',
-              tipo: formData.get('tipo') || 'Otra',
+              tipo: formData.get('tipo') || '110',
               precio: formData.get('precio') || '$0',
               anio: formData.get('anio') || '',
               descripcion: formData.get('descripcion') || '',

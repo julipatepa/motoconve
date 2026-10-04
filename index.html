@@ -873,6 +873,9 @@ Consultanos por WhatsApp para conocer las unidades disponibles y recibir más in
       let editingId = null;
       let motoData = [];
       let activeTipoFilter = '';
+      let selectedNewFiles = [];
+      let deletedExistingPhotoUrls = new Set();
+      let firestoreDb = null;
 
       // Fallback local por si Firebase no está disponible
       const defaultMotos = [
@@ -930,7 +933,10 @@ Consultanos por WhatsApp para conocer las unidades disponibles y recibir más in
               </ul>
               <div class="card-actions">
                 <a class="btn primary" href="${buildConsultaLink(moto)}" target="_blank" rel="noopener">Consultar</a>
-                ${isAdmin && !String(moto.id).startsWith('default-') ? `<button type="button" class="btn secondary edit-btn" data-id="${moto.id}">Editar</button>` : ''}
+                ${isAdmin && !String(moto.id).startsWith('default-') ? `
+                  <button type="button" class="btn secondary edit-btn" data-id="${moto.id}">Editar</button>
+                  <button type="button" class="btn secondary delete-btn" data-id="${moto.id}" style="border-color: rgba(255,107,53,0.6); color: #ffd1c1;">Eliminar</button>
+                ` : ''}
               </div>
             </div>
           </article>
@@ -961,8 +967,29 @@ Consultanos por WhatsApp para conocer las unidades disponibles y recibir más in
         }
       }
 
-      // Delegación de eventos para "Ver video", "Editar" y galería de fotos
-      grid.addEventListener('click', (e) => {
+      async function deleteMoto(id) {
+        if (!id) return;
+        const confirmed = window.confirm('¿Seguro que querés eliminar esta moto?');
+        if (!confirmed) return;
+
+        if (firestoreDb) {
+          const { deleteDoc, doc } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
+          await deleteDoc(doc(firestoreDb, 'motos', id));
+          return;
+        }
+
+        motoData = motoData.filter((m) => m.id !== id);
+        renderAll();
+      }
+
+      // Delegación de eventos para "Ver video", "Editar", "Eliminar" y galería de fotos
+      grid.addEventListener('click', async (e) => {
+        const deleteBtn = e.target.closest('.delete-btn');
+        if (deleteBtn) {
+          await deleteMoto(deleteBtn.dataset.id);
+          return;
+        }
+
         const editBtn = e.target.closest('.edit-btn');
         if (editBtn) {
           const moto = motoData.find((m) => m.id === editBtn.dataset.id);
@@ -1115,11 +1142,10 @@ Consultanos por WhatsApp para conocer las unidades disponibles y recibir más in
         document.getElementById('destacada').checked = !!moto.destacada;
         const photos = normalizeMotoPhotos(moto);
         document.getElementById('fotoActual').value = JSON.stringify(photos);
+        selectedNewFiles = [];
+        deletedExistingPhotoUrls = new Set();
         document.getElementById('foto').value = '';
-        const preview = document.getElementById('fotoPreview');
-        preview.innerHTML = photos.length
-          ? photos.map((url) => `<img src="${cloudinaryResponsive(url, { width: 200 })}" alt="Vista previa" style="max-height:90px;border-radius:8px;border:1px solid var(--line);" />`).join('')
-          : '';
+        renderPhotoPreview();
 
         document.getElementById('formTitle').textContent = `Editando: ${moto.marca} ${moto.modelo}`;
         document.getElementById('submitFormBtn').textContent = 'Guardar cambios';
@@ -1129,11 +1155,56 @@ Consultanos por WhatsApp para conocer las unidades disponibles y recibir más in
         document.getElementById('admin').scrollIntoView({ behavior: 'smooth' });
       }
 
+      function renderPhotoPreview() {
+        const preview = document.getElementById('fotoPreview');
+        const existingUrls = parseStoredPhotos(document.getElementById('fotoActual').value).filter((url) => !deletedExistingPhotoUrls.has(url));
+        const photoItems = [
+          ...existingUrls.map((url) => ({ type: 'existing', url })),
+          ...selectedNewFiles.map((file) => ({ type: 'new', url: URL.createObjectURL(file), file }))
+        ];
+
+        if (!photoItems.length) {
+          preview.innerHTML = '<span style="color: var(--muted); font-size: 0.85rem;">Sin fotos cargadas</span>';
+          return;
+        }
+
+        preview.innerHTML = photoItems.map((item) => {
+          const src = item.type === 'existing' ? cloudinaryResponsive(item.url, { width: 220 }) : item.url;
+          const label = item.type === 'existing' ? 'Foto guardada' : 'Nueva foto';
+          return `
+            <div style="position: relative; display: inline-block; border-radius: 10px; overflow: hidden; border: 1px solid var(--line); background: rgba(255,255,255,0.03);">
+              <img src="${src}" alt="${label}" style="display:block; max-height: 90px; width: auto; max-width: 120px; object-fit: cover;" />
+              <button type="button" data-photo-type="${item.type}" data-photo-url="${item.type === 'existing' ? item.url : ''}" data-file-name="${item.type === 'new' ? item.file.name : ''}" style="position:absolute; top:6px; right:6px; background: rgba(10,15,26,0.85); color: #fff; border:1px solid rgba(255,255,255,0.2); border-radius: 50%; width: 20px; height: 20px; cursor:pointer; font-size: 13px; line-height: 1;">×</button>
+            </div>
+          `;
+        }).join('');
+
+        preview.querySelectorAll('button[data-photo-type]').forEach((button) => {
+          button.addEventListener('click', () => {
+            const type = button.dataset.photoType;
+            if (type === 'existing') {
+              deletedExistingPhotoUrls.add(button.dataset.photoUrl);
+            } else {
+              const fileName = button.dataset.fileName;
+              selectedNewFiles = selectedNewFiles.filter((file) => file.name !== fileName);
+            }
+            renderPhotoPreview();
+          });
+        });
+      }
+
+      function clearPhotoSelection() {
+        selectedNewFiles = [];
+        deletedExistingPhotoUrls = new Set();
+        document.getElementById('foto').value = '';
+        document.getElementById('fotoActual').value = '';
+        renderPhotoPreview();
+      }
+
       function exitEditMode() {
         editingId = null;
         motoForm.reset();
-        document.getElementById('fotoActual').value = '';
-        document.getElementById('fotoPreview').innerHTML = '';
+        clearPhotoSelection();
         document.getElementById('formTitle').textContent = 'Agregar nueva moto';
         document.getElementById('submitFormBtn').textContent = 'Agregar moto';
         cancelEditBtn.classList.add('hidden');
@@ -1141,29 +1212,19 @@ Consultanos por WhatsApp para conocer las unidades disponibles y recibir más in
 
       document.getElementById('foto').addEventListener('change', (e) => {
         const files = Array.from(e.target.files || []);
-        const preview = document.getElementById('fotoPreview');
         if (!files.length) {
-          preview.innerHTML = '';
+          renderPhotoPreview();
           return;
         }
 
-        preview.innerHTML = files.map((file) => {
-          const reader = new FileReader();
-          reader.readAsDataURL(file);
-          return `<img alt="Vista previa" style="max-height:90px;border-radius:8px;border:1px solid var(--line);" />`;
-        }).join('');
-
-        files.forEach((file, index) => {
-          const reader = new FileReader();
-          reader.onload = () => {
-            const imgs = preview.querySelectorAll('img');
-            if (imgs[index]) imgs[index].src = reader.result;
-          };
-          reader.readAsDataURL(file);
-        });
+        selectedNewFiles = [...selectedNewFiles, ...files];
+        renderPhotoPreview();
       });
 
-      resetBtn.addEventListener('click', () => { motoForm.reset(); document.getElementById('fotoPreview').innerHTML = ''; });
+      resetBtn.addEventListener('click', () => {
+        motoForm.reset();
+        clearPhotoSelection();
+      });
       cancelEditBtn.addEventListener('click', () => { exitEditMode(); });
 
       async function uploadMultiplePhotos(files) {
@@ -1180,6 +1241,13 @@ Consultanos por WhatsApp para conocer las unidades disponibles y recibir más in
         return String(value).split(',').map((item) => item.trim()).filter(Boolean);
       }
 
+      function buildFinalPhotoUrls() {
+        const stored = parseStoredPhotos(document.getElementById('fotoActual').value);
+        const remainingStored = stored.filter((url) => !deletedExistingPhotoUrls.has(url));
+        const uploadedNewUrls = selectedNewFiles.length ? selectedNewFiles.map((file) => file.name) : [];
+        return [...remainingStored, ...uploadedNewUrls];
+      }
+
       function attachFormHandler(saveFn) {
         motoForm.addEventListener('submit', async (e) => {
           e.preventDefault();
@@ -1191,12 +1259,10 @@ Consultanos por WhatsApp para conocer las unidades disponibles y recibir más in
 
           try {
             const formData = new FormData(form);
-            const fotoFiles = Array.from(document.getElementById('foto').files || []);
-            let fotoUrls = parseStoredPhotos(document.getElementById('fotoActual').value);
-
-            if (fotoFiles.length) {
-              fotoUrls = await uploadMultiplePhotos(fotoFiles);
-            }
+            const newUploads = selectedNewFiles.length ? await uploadMultiplePhotos(selectedNewFiles) : [];
+            const stored = parseStoredPhotos(document.getElementById('fotoActual').value);
+            const remainingStored = stored.filter((url) => !deletedExistingPhotoUrls.has(url));
+            const fotoUrls = [...remainingStored, ...newUploads];
 
             const moto = {
               marca: formData.get('marca') || 'Marca',
@@ -1238,11 +1304,11 @@ Consultanos por WhatsApp para conocer las unidades disponibles y recibir más in
 
         import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js').then(({ initializeApp }) => {
           import('https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js').then(({ getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged }) => {
-            import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js').then(({ getFirestore, collection, addDoc, updateDoc, doc, serverTimestamp, query, orderBy, onSnapshot }) => {
+            import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js').then(({ getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, serverTimestamp, query, orderBy, onSnapshot }) => {
               const app = initializeApp(firebaseConfig);
               const auth = getAuth(app);
               const db = getFirestore(app);
-
+              firestoreDb = db;
               authBtn.addEventListener('click', () => {
                 const user = auth.currentUser;
                 if (user) {

@@ -1084,11 +1084,26 @@ Consultanos por WhatsApp para conocer las unidades disponibles y recibir más in
       });
 
       // ---- Filtros (marca, año, tipo) ----
+      // Normaliza la marca (sin tildes, sin espacios de más, minúsculas)
+      // para que "Yamaha", "yamaha " y "YAMAHA" cuenten como la misma.
+      const normMarca = (s) => String(s || '')
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .trim().replace(/\s+/g, ' ').toLowerCase();
+
+      const prettyMarca = (s) => String(s || '').trim().replace(/\s+/g, ' ')
+        .toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase());
+
       function populateFilterOptions() {
         const marcaSel = document.getElementById('filtroMarca');
         const marcaActual = marcaSel.value;
-        const marcas = [...new Set(motoData.map((m) => m.marca).filter(Boolean))].sort();
-        marcaSel.innerHTML = '<option value="">Todas las marcas</option>' + marcas.map((m) => `<option value="${m}">${m}</option>`).join('');
+        const map = new Map();
+        motoData.forEach((m) => {
+          const k = normMarca(m.marca);
+          if (k && !map.has(k)) map.set(k, prettyMarca(m.marca));
+        });
+        const marcas = [...map.entries()].sort((a, b) => a[1].localeCompare(b[1]));
+        marcaSel.innerHTML = '<option value="">Todas las marcas</option>' +
+          marcas.map(([k, label]) => `<option value="${k}">${label}</option>`).join('');
         marcaSel.value = marcaActual;
       }
 
@@ -1096,7 +1111,7 @@ Consultanos por WhatsApp para conocer las unidades disponibles y recibir más in
         const marca = document.getElementById('filtroMarca').value;
         const formulario = document.getElementById('filtroFormulario').value;
         return motoData.filter((m) => {
-          if (marca && m.marca !== marca) return false;
+          if (marca && normMarca(m.marca) !== marca) return false;
           if (formulario && m.formulario !== formulario) return false;
           if (activeTipoFilter && m.tipo !== activeTipoFilter) return false;
           return true;
@@ -1265,7 +1280,7 @@ Consultanos por WhatsApp para conocer las unidades disponibles y recibir más in
             const fotoUrls = [...remainingStored, ...newUploads];
 
             const moto = {
-              marca: formData.get('marca') || 'Marca',
+              marca: (formData.get('marca') || 'Marca').trim(),
               modelo: formData.get('modelo') || 'Modelo',
               tipo: formData.get('tipo') || '110',
               precio: formData.get('precio') || '$0',
